@@ -1,0 +1,64 @@
+services:
+  app:
+    build:
+      context: ./docker/php
+      args:
+        WWWUSER: ${WWWUSER:-1000}
+        WWWGROUP: ${WWWGROUP:-1000}
+    container_name: stockflow_app
+    working_dir: /var/www/html
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - mysql
+    networks:
+      - stockflow
+
+  nginx:
+    image: nginx:alpine
+    container_name: stockflow_nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - stockflow
+
+  mysql:
+    image: mysql:8.0
+    container_name: stockflow_mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: stockflow
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: stockflow
+      MYSQL_PASSWORD: secret
+    volumes:
+      - stockflow_mysql_data:/var/lib/mysql
+    networks:
+      - stockflow
+
+  node:
+    image: node:20-alpine
+    container_name: stockflow_node
+    user: "${WWWUSER:-1000}:${WWWGROUP:-1000}"
+    working_dir: /var/www/html
+    environment:
+      HOME: /tmp
+    volumes:
+      - ./src:/var/www/html
+    command: sh
+    tty: true
+    networks:
+      - stockflow
+
+volumes:
+  stockflow_mysql_data:
+
+networks:
+  stockflow:
+    driver: bridge
