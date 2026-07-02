@@ -5,7 +5,7 @@ Esta guia sirve para usar este Docker como base de cualquier proyecto Laravel si
 ## Estructura
 
 ```text
-stockflow/
+velntra/
 ├── docker/
 │   ├── nginx/
 │   └── php/
@@ -44,14 +44,14 @@ docker compose exec app chmod -R 775 storage bootstrap/cache
 Configurar `src/.env`:
 
 ```env
-APP_NAME=StockFlow
+APP_NAME=Velntra
 APP_URL=http://localhost:8000
 
 DB_CONNECTION=mysql
 DB_HOST=mysql
 DB_PORT=3306
-DB_DATABASE=stockflow
-DB_USERNAME=stockflow
+DB_DATABASE=velntra
+DB_USERNAME=velntra
 DB_PASSWORD=secret
 ```
 
@@ -154,8 +154,8 @@ Crear una conexion MySQL con estos datos:
 ```text
 Host: localhost
 Port: 3307
-Database: stockflow
-Username: stockflow
+Database: velntra
+Username: velntra
 Password: secret
 ```
 
@@ -164,7 +164,7 @@ Usuario root, si lo necesitas:
 ```text
 Host: localhost
 Port: 3307
-Database: stockflow
+Database: velntra
 Username: root
 Password: root
 ```
@@ -178,10 +178,10 @@ Cuando copies esta plantilla para otro proyecto, cambia estos valores:
 1. Nombre de contenedores en `docker-compose.yml`:
 
 ```yaml
-container_name: stockflow_app
-container_name: stockflow_nginx
-container_name: stockflow_mysql
-container_name: stockflow_node
+container_name: velntra_app
+container_name: velntra_nginx
+container_name: velntra_mysql
+container_name: velntra_node
 ```
 
 Ejemplo para `inventario`:
@@ -197,10 +197,10 @@ container_name: inventario_node
 
 ```yaml
 volumes:
-  stockflow_mysql_data:
+  velntra_mysql_data:
 
 networks:
-  stockflow:
+  velntra:
 ```
 
 Ejemplo:
@@ -213,21 +213,21 @@ networks:
   inventario:
 ```
 
-Tambien cambia cada `networks: - stockflow` por el nuevo nombre.
+Tambien cambia cada `networks: - velntra` por el nuevo nombre.
 
 3. Base de datos:
 
 ```yaml
-MYSQL_DATABASE: stockflow
-MYSQL_USER: stockflow
+MYSQL_DATABASE: velntra
+MYSQL_USER: velntra
 MYSQL_PASSWORD: secret
 ```
 
 Y en `src/.env`:
 
 ```env
-DB_DATABASE=stockflow
-DB_USERNAME=stockflow
+DB_DATABASE=velntra
+DB_USERNAME=velntra
 DB_PASSWORD=secret
 ```
 
@@ -254,7 +254,7 @@ Usa uno diferente por proyecto, por ejemplo `3308`, `3309`, `3310`.
 Puedes usar un dominio local como:
 
 ```text
-stockflow.test
+velntra.test
 ```
 
 ### 1. Editar `/etc/hosts`
@@ -268,7 +268,7 @@ sudo nano /etc/hosts
 Agrega:
 
 ```text
-127.0.0.1 stockflow.test
+127.0.0.1 velntra.test
 ```
 
 Guarda el archivo.
@@ -284,7 +284,7 @@ server_name localhost;
 Por:
 
 ```nginx
-server_name stockflow.test;
+server_name velntra.test;
 ```
 
 ### 3. Configurar Laravel
@@ -292,13 +292,13 @@ server_name stockflow.test;
 En `src/.env`:
 
 ```env
-APP_URL=http://stockflow.test:8000
+APP_URL=http://velntra.test:8000
 ```
 
 Si cambiaste el puerto web a `8081`:
 
 ```env
-APP_URL=http://stockflow.test:8081
+APP_URL=http://velntra.test:8081
 ```
 
 ### 4. Reiniciar Docker
@@ -310,10 +310,10 @@ docker compose restart nginx app
 Abre:
 
 ```text
-http://stockflow.test:8000
+http://velntra.test:8000
 ```
 
-Si quieres usar `http://stockflow.test` sin puerto, cambia el puerto web a:
+Si quieres usar `http://velntra.test` sin puerto, cambia el puerto web a:
 
 ```yaml
 nginx:

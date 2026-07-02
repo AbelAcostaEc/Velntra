@@ -5,18 +5,18 @@ services:
       args:
         WWWUSER: ${WWWUSER:-1000}
         WWWGROUP: ${WWWGROUP:-1000}
-    container_name: stockflow_app
+    container_name: velntra_app
     working_dir: /var/www/html
     volumes:
       - ./src:/var/www/html
     depends_on:
       - mysql
     networks:
-      - stockflow
+      - velntra
 
   nginx:
     image: nginx:alpine
-    container_name: stockflow_nginx
+    container_name: velntra_nginx
     ports:
       - "8000:80"
     volumes:
@@ -25,26 +25,26 @@ services:
     depends_on:
       - app
     networks:
-      - stockflow
+      - velntra
 
   mysql:
     image: mysql:8.0
-    container_name: stockflow_mysql
+    container_name: velntra_mysql
     ports:
       - "3307:3306"
     environment:
-      MYSQL_DATABASE: stockflow
+      MYSQL_DATABASE: velntra
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: stockflow
+      MYSQL_USER: velntra
       MYSQL_PASSWORD: secret
     volumes:
-      - stockflow_mysql_data:/var/lib/mysql
+      - velntra_mysql_data:/var/lib/mysql
     networks:
-      - stockflow
+      - velntra
 
   node:
     image: node:20-alpine
-    container_name: stockflow_node
+    container_name: velntra_node
     user: "${WWWUSER:-1000}:${WWWGROUP:-1000}"
     working_dir: /var/www/html
     environment:
@@ -54,11 +54,11 @@ services:
     command: sh
     tty: true
     networks:
-      - stockflow
+      - velntra
 
 volumes:
-  stockflow_mysql_data:
+  velntra_mysql_data:
 
 networks:
-  stockflow:
+  velntra:
     driver: bridge
