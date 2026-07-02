@@ -1,8 +1,10 @@
-# Dev Guide - Laravel Docker
+# Guía de Desarrollo - Docker para Laravel
 
-Esta guia sirve para usar este Docker como base de cualquier proyecto Laravel sin instalar PHP, Composer, MySQL ni Node directamente en tu maquina.
+Esta guía sirve para usar este Docker como base de cualquier proyecto Laravel sin instalar PHP, Composer, MySQL ni Node directamente en tu máquina.
 
-## Estructura
+## Objetivo
+
+El directorio `src/` contiene el proyecto Laravel. La carpeta `docker/` contiene la base reutilizable para levantar PHP-FPM, Nginx, MySQL y Node.
 
 ```text
 velntra/
@@ -10,41 +12,72 @@ velntra/
 │   ├── nginx/
 │   └── php/
 ├── docker-compose.yml
+├── .env.example
 └── src/
 ```
 
-- `src/`: aqui vive el proyecto Laravel.
-- `docker/php/`: imagen PHP con Composer y extensiones comunes para Laravel.
-- `docker/nginx/`: configuracion de Nginx.
-- `mysql`: base de datos interna del entorno.
-- `node`: contenedor para npm, Vite, Tailwind, etc.
+## Configuración inicial
 
-## Comandos para iniciar
+Antes de levantar Docker, copia el archivo de variables de la raíz:
 
-Desde la carpeta del proyecto:
+```bash
+cp .env.example .env
+```
+
+Ese archivo `.env` pertenece a Docker Compose, no al `.env` de Laravel dentro de `src/`.
+
+Valores principales:
+
+```env
+COMPOSE_PROJECT_NAME=velntra
+APP_PORT=8000
+FORWARD_DB_PORT=3307
+VITE_PORT=5173
+DB_DATABASE=velntra
+DB_USERNAME=velntra
+DB_PASSWORD=secret
+DB_ROOT_PASSWORD=root
+WWWUSER=1000
+WWWGROUP=1000
+```
+
+`COMPOSE_PROJECT_NAME` es importante porque Docker Compose usa ese nombre para generar los contenedores, la red y el volumen. Si copias esta plantilla para otro proyecto, cambia ese valor para evitar choques con otros entornos.
+
+## Levantar el entorno
+
+Desde la raíz del proyecto:
 
 ```bash
 docker compose up -d --build
 ```
 
-Crear Laravel dentro de `src`:
+Verifica el estado:
+
+```bash
+docker compose ps
+```
+
+Abre la aplicación en:
+
+```text
+http://localhost:8000
+```
+
+Si usas un dominio local, por ejemplo `velntra.test`, recuerda configurarlo en `/etc/hosts` y en `docker/nginx/default.conf`.
+
+## Crear o preparar Laravel
+
+Si `src/` está vacío, puedes crear Laravel dentro de ese directorio:
 
 ```bash
 docker compose exec app composer create-project laravel/laravel .
 ```
 
-Si `src` ya tiene archivos, Composer puede que no quiera instalar. En ese caso crea Laravel en una carpeta vacia o limpia `src` antes de instalar.
+Si `src/` ya tiene archivos, Composer puede rechazar la instalación. En ese caso, crea Laravel en una carpeta vacía o limpia `src/` antes de instalar.
 
-Permisos de Laravel:
-
-```bash
-docker compose exec app chmod -R 775 storage bootstrap/cache
-```
-
-Configurar `src/.env`:
+Configura `src/.env` con la conexión a MySQL del contenedor:
 
 ```env
-APP_NAME=Velntra
 APP_URL=http://localhost:8000
 
 DB_CONNECTION=mysql
@@ -55,101 +88,90 @@ DB_USERNAME=velntra
 DB_PASSWORD=secret
 ```
 
-Generar key si hace falta:
+Luego ejecuta:
 
 ```bash
 docker compose exec app php artisan key:generate
-```
-
-Migrar:
-
-```bash
 docker compose exec app php artisan migrate
 ```
 
-Node para Tailwind/Vite:
+Si Laravel necesita corregir permisos:
+
+```bash
+docker compose exec -u root app chown -R 1000:1000 /var/www/html
+docker compose exec app chmod -R 775 storage bootstrap/cache
+```
+
+## Node, Vite y Tailwind
+
+Instalar dependencias:
 
 ```bash
 docker compose run --rm node npm install
-docker compose run --rm node npm run dev
 ```
 
-Entrar al contenedor PHP:
+Modo desarrollo:
 
 ```bash
-docker compose exec app bash
+docker compose run --rm --service-ports node npm run dev
+```
+
+Compilar assets:
+
+```bash
+docker compose run --rm node npm run build
 ```
 
 ## Puertos
 
-### Cambiar el puerto web
+El puerto web externo se controla desde el `.env` de la raíz:
 
-Actualmente Nginx se publica asi en `docker-compose.yml`:
-
-```yaml
-nginx:
-  ports:
-    - "8000:80"
+```env
+APP_PORT=8000
 ```
 
-El primer numero es el puerto de tu PC. El segundo es el puerto interno del contenedor.
+Para usar `http://localhost:8081`, cambia:
 
-Para mostrar el proyecto en `http://localhost:8081`, cambia a:
-
-```yaml
-nginx:
-  ports:
-    - "8081:80"
+```env
+APP_PORT=8081
 ```
 
-Luego reinicia:
+Luego aplica:
 
 ```bash
 docker compose up -d
 ```
 
-Y cambia `APP_URL` en `src/.env`:
+También cambia `APP_URL` en `src/.env`:
 
 ```env
 APP_URL=http://localhost:8081
 ```
 
-### Cambiar el puerto externo de MySQL
+El puerto externo de MySQL también se controla desde el `.env` raíz:
 
-Actualmente MySQL se publica asi:
-
-```yaml
-mysql:
-  ports:
-    - "3307:3306"
+```env
+FORWARD_DB_PORT=3307
 ```
 
-Desde otros contenedores Laravel usa siempre:
+Laravel siempre usa el puerto interno:
 
 ```env
 DB_HOST=mysql
 DB_PORT=3306
 ```
 
-Desde tu PC, DBeaver u otro cliente usa el puerto externo, en este caso `3307`.
+Desde tu PC, DBeaver u otro cliente usa el puerto externo, por ejemplo `3307`.
 
-Para usar otro puerto en tu PC, por ejemplo `3310`, cambia:
+El puerto de Vite se controla con:
 
-```yaml
-mysql:
-  ports:
-    - "3310:3306"
-```
-
-Luego:
-
-```bash
-docker compose up -d
+```env
+VITE_PORT=5173
 ```
 
 ## Conectarse con DBeaver
 
-Crear una conexion MySQL con estos datos:
+Conexión normal:
 
 ```text
 Host: localhost
@@ -169,85 +191,68 @@ Username: root
 Password: root
 ```
 
-Importante: en Laravel el host es `mysql`, pero en DBeaver desde tu PC el host es `localhost`.
+Importante: en Laravel el host es `mysql`, pero desde tu PC el host es `localhost`.
 
-## Personalizar para otro proyecto Laravel
+## Evitar choques entre proyectos
 
-Cuando copies esta plantilla para otro proyecto, cambia estos valores:
+Este Docker no usa `container_name` fijo. Eso permite que Docker Compose genere nombres usando `COMPOSE_PROJECT_NAME`.
 
-1. Nombre de contenedores en `docker-compose.yml`:
-
-```yaml
-container_name: velntra_app
-container_name: velntra_nginx
-container_name: velntra_mysql
-container_name: velntra_node
-```
-
-Ejemplo para `inventario`:
-
-```yaml
-container_name: inventario_app
-container_name: inventario_nginx
-container_name: inventario_mysql
-container_name: inventario_node
-```
-
-2. Nombre de red y volumen:
-
-```yaml
-volumes:
-  velntra_mysql_data:
-
-networks:
-  velntra:
-```
-
-Ejemplo:
-
-```yaml
-volumes:
-  inventario_mysql_data:
-
-networks:
-  inventario:
-```
-
-Tambien cambia cada `networks: - velntra` por el nuevo nombre.
-
-3. Base de datos:
-
-```yaml
-MYSQL_DATABASE: velntra
-MYSQL_USER: velntra
-MYSQL_PASSWORD: secret
-```
-
-Y en `src/.env`:
+Para otro proyecto, por ejemplo `inventario`, cambia el `.env` raíz:
 
 ```env
-DB_DATABASE=velntra
-DB_USERNAME=velntra
+COMPOSE_PROJECT_NAME=inventario
+APP_PORT=8001
+FORWARD_DB_PORT=3308
+VITE_PORT=5174
+DB_DATABASE=inventario
+DB_USERNAME=inventario
 DB_PASSWORD=secret
 ```
 
-4. Puerto web si tienes varios proyectos corriendo:
+Con eso, Compose generará recursos como:
 
-```yaml
-ports:
-  - "8000:80"
+```text
+inventario-app-1
+inventario-nginx-1
+inventario-mysql-1
+inventario_velntra_mysql_data
 ```
 
-Usa uno diferente por proyecto, por ejemplo `8001`, `8002`, `8081`.
+Aunque el volumen se llame `velntra_mysql_data` dentro del `docker-compose.yml`, Docker Compose lo prefija con `COMPOSE_PROJECT_NAME`, por eso no choca entre proyectos distintos.
 
-5. Puerto externo de MySQL si tienes varios proyectos:
+## Si Docker dice que el contenedor o volumen ya existe
 
-```yaml
-ports:
-  - "3307:3306"
+Primero revisa si ya hay un entorno levantado desde esa carpeta:
+
+```bash
+docker compose ps
 ```
 
-Usa uno diferente por proyecto, por ejemplo `3308`, `3309`, `3310`.
+Si solo quieres levantarlo de nuevo:
+
+```bash
+docker compose up -d
+```
+
+Si quedó un entorno viejo de la misma plantilla, detenlo:
+
+```bash
+docker compose down
+```
+
+Si el choque viene de contenedores creados antes con `container_name` fijo, elimínalos manualmente una sola vez:
+
+```bash
+docker rm -f velntra_app velntra_nginx velntra_mysql velntra_node
+```
+
+Si el problema es el volumen viejo y no necesitas conservar esa base de datos:
+
+```bash
+docker volume rm velntra_mysql_data
+```
+
+Si sí necesitas conservar datos, no borres el volumen. Cambia `COMPOSE_PROJECT_NAME` o migra la información antes.
 
 ## Dominios locales en Linux
 
@@ -257,9 +262,7 @@ Puedes usar un dominio local como:
 velntra.test
 ```
 
-### 1. Editar `/etc/hosts`
-
-Abre el archivo:
+Edita `/etc/hosts`:
 
 ```bash
 sudo nano /etc/hosts
@@ -271,23 +274,11 @@ Agrega:
 127.0.0.1 velntra.test
 ```
 
-Guarda el archivo.
-
-### 2. Configurar Nginx
-
-En `docker/nginx/default.conf`, cambia:
-
-```nginx
-server_name localhost;
-```
-
-Por:
+En `docker/nginx/default.conf`, usa:
 
 ```nginx
 server_name velntra.test;
 ```
-
-### 3. Configurar Laravel
 
 En `src/.env`:
 
@@ -295,30 +286,16 @@ En `src/.env`:
 APP_URL=http://velntra.test:8000
 ```
 
-Si cambiaste el puerto web a `8081`:
-
-```env
-APP_URL=http://velntra.test:8081
-```
-
-### 4. Reiniciar Docker
+Reinicia Nginx:
 
 ```bash
-docker compose restart nginx app
+docker compose restart nginx
 ```
 
-Abre:
+Si quieres abrir `http://velntra.test` sin puerto, cambia el puerto web a:
 
-```text
-http://velntra.test:8000
-```
-
-Si quieres usar `http://velntra.test` sin puerto, cambia el puerto web a:
-
-```yaml
-nginx:
-  ports:
-    - "80:80"
+```env
+APP_PORT=80
 ```
 
 Luego:
@@ -327,9 +304,9 @@ Luego:
 docker compose up -d
 ```
 
-Nota: usar el puerto `80` puede chocar con Apache, Nginx u otro servicio instalado en tu Linux.
+Nota: el puerto `80` puede chocar con Apache, Nginx u otro servicio instalado en Linux.
 
-## Comandos utiles
+## Comandos útiles
 
 Ver contenedores:
 
@@ -346,16 +323,10 @@ docker compose logs -f nginx
 docker compose logs -f mysql
 ```
 
-Detener:
+Entrar al contenedor PHP:
 
 ```bash
-docker compose down
-```
-
-Detener y borrar la base de datos del volumen:
-
-```bash
-docker compose down -v
+docker compose exec app bash
 ```
 
 Instalar dependencias PHP:
@@ -373,31 +344,21 @@ docker compose exec app php artisan config:clear
 docker compose exec app php artisan route:clear
 ```
 
-Ejecutar npm:
+Detener:
 
 ```bash
-docker compose run --rm node npm install
-docker compose run --rm node npm run dev
-docker compose run --rm node npm run build
+docker compose down
 ```
 
-## Permisos
-
-Este Docker esta preparado para que el contenedor PHP y Node creen archivos con el mismo UID/GID de tu usuario Linux.
-
-Si algun archivo queda con permisos incorrectos, corrige una vez con:
+Detener y borrar también la base de datos del volumen:
 
 ```bash
-docker compose exec -u root app chown -R 1000:1000 /var/www/html
-docker compose exec app chmod -R 775 storage bootstrap/cache
+docker compose down -v
 ```
 
-Si tu usuario Linux no usa UID/GID `1000`, crea un archivo `.env` en la raiz del Docker, al lado de `docker-compose.yml`:
+## Permisos en Linux
 
-```env
-WWWUSER=1001
-WWWGROUP=1001
-```
+Este Docker está preparado para que PHP y Node creen archivos con el mismo UID/GID de tu usuario Linux.
 
 Puedes ver tus valores con:
 
@@ -406,22 +367,29 @@ id -u
 id -g
 ```
 
+Si tu usuario no usa `1000:1000`, cambia el `.env` de la raíz:
+
+```env
+WWWUSER=1001
+WWWGROUP=1001
+```
+
 Luego reconstruye:
 
 ```bash
 docker compose up -d --build
 ```
 
-## Resumen rapido
+## Resumen rápido
 
 ```bash
+cp .env.example .env
 docker compose up -d --build
-docker compose exec app composer create-project laravel/laravel .
-docker compose exec app chmod -R 775 storage bootstrap/cache
+docker compose exec app composer install
 docker compose exec app php artisan key:generate
 docker compose exec app php artisan migrate
 docker compose run --rm node npm install
-docker compose run --rm node npm run dev
+docker compose run --rm --service-ports node npm run dev
 ```
 
-Con esto tienes un entorno Docker listo para Laravel, MySQL, Composer, Nginx y Node sin instalar esas herramientas directamente en tu maquina.
+Con esto tienes un entorno Docker listo para Laravel, MySQL, Composer, Nginx y Node sin instalar esas herramientas directamente en tu máquina.

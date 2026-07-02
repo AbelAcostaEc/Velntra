@@ -5,20 +5,19 @@ services:
       args:
         WWWUSER: ${WWWUSER:-1000}
         WWWGROUP: ${WWWGROUP:-1000}
-    container_name: velntra_app
     working_dir: /var/www/html
     volumes:
       - ./src:/var/www/html
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - velntra
 
   nginx:
     image: nginx:alpine
-    container_name: velntra_nginx
     ports:
-      - "8000:80"
+      - "${APP_PORT:-8000}:80"
     volumes:
       - ./src:/var/www/html
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
@@ -29,24 +28,30 @@ services:
 
   mysql:
     image: mysql:8.0
-    container_name: velntra_mysql
     ports:
-      - "3307:3306"
+      - "${FORWARD_DB_PORT:-3307}:3306"
     environment:
-      MYSQL_DATABASE: velntra
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: velntra
-      MYSQL_PASSWORD: secret
+      MYSQL_DATABASE: ${DB_DATABASE:-velntra}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MYSQL_USER: ${DB_USERNAME:-velntra}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
     volumes:
       - velntra_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_ROOT_PASSWORD:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
     networks:
       - velntra
 
   node:
     image: node:20-alpine
-    container_name: velntra_node
     user: "${WWWUSER:-1000}:${WWWGROUP:-1000}"
     working_dir: /var/www/html
+    ports:
+      - "${VITE_PORT:-5173}:5173"
     environment:
       HOME: /tmp
     volumes:

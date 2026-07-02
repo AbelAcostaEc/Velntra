@@ -1,6 +1,6 @@
 ## Current Sprint
 
-Sprint 03 - Inventory
+Sprint 01 - Configuration
 
 ### Completed
 

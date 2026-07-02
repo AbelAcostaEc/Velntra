@@ -1,0 +1,22 @@
+# Variables locales de Docker Compose
+.env
+.env.*
+!.env.example
+
+# Overrides locales de Docker
+docker-compose.override.yml
+compose.override.yml
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Configuración local del editor
+.idea/
+.vscode/
+.zed/
+
+# Logs y archivos temporales
+*.log
+*.tmp
+*.temp
