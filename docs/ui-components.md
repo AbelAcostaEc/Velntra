@@ -63,6 +63,28 @@ Laravel Collective can render fields inside a `Form Section` when a custom helpe
 <x-alert variant="warning" title="Low stock">Review this product soon.</x-alert>
 ```
 
+## Toast Notifications
+
+`x-toast` is included once in the app layout. Dispatch a browser event from Alpine or Livewire to show a modern autohide notification.
+
+```blade
+<x-button
+    x-on:click="$dispatch('toast', {
+        type: 'success',
+        title: 'Saved',
+        message: 'The record was saved successfully.'
+    })"
+>
+    Show toast
+</x-button>
+```
+
+From Livewire, dispatch the same browser event:
+
+```php
+$this->dispatch('toast', type: 'success', title: 'Saved', message: 'The record was saved successfully.');
+```
+
 ## Cards
 
 ```blade
@@ -80,7 +102,7 @@ Use `x-table` for the shared desktop/mobile pattern. Desktop rows go in the defa
 ```blade
 <x-table loading-target="search">
     <x-slot:toolbar>
-        <x-search-input wire:model.live.debounce.300ms="search" />
+        <x-table-search wire:model.live.debounce.300ms="search" />
         <x-button variant="secondary">Filters</x-button>
     </x-slot:toolbar>
 
@@ -104,9 +126,17 @@ Use `x-table` for the shared desktop/mobile pattern. Desktop rows go in the defa
     </x-slot:mobile>
 
     <x-slot:pagination>
-        <x-pagination />
+        <x-pagination :paginator="$products" livewire />
     </x-slot:pagination>
 </x-table>
+```
+
+Use `livewire` when the table is inside a Livewire component. The paginator will call `previousPage`, `nextPage` and `gotoPage` without a full page reload.
+
+For non-paginator demos or custom adapters, pass simple values:
+
+```blade
+<x-pagination :current-page="2" :last-page="8" :from="11" :to="20" :total="76" />
 ```
 
 ## Modals

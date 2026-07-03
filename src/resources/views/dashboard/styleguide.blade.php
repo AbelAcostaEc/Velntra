@@ -42,6 +42,11 @@
                     <x-badge variant="info">Synced</x-badge>
                 </div>
                 <x-alert variant="success" title="Ready">Components are visual only and can be wired to Livewire later.</x-alert>
+                <div class="flex flex-wrap gap-2">
+                    <x-button variant="secondary" x-on:click="$dispatch('toast', { type: 'success', title: 'Saved', message: 'The record was saved successfully.' })">Success toast</x-button>
+                    <x-button variant="secondary" x-on:click="$dispatch('toast', { type: 'warning', title: 'Low stock', message: 'Some products need inventory review.' })">Warning toast</x-button>
+                    <x-button variant="secondary" x-on:click="$dispatch('toast', { type: 'danger', title: 'Action failed', message: 'Please review the form and try again.' })">Danger toast</x-button>
+                </div>
             </div>
         </x-card>
 
@@ -53,7 +58,7 @@
 
         <x-table loading-target="search">
             <x-slot:toolbar>
-                <x-search-input placeholder="Search inventory..." wire:model.live.debounce.300ms="search" />
+                <x-table-search placeholder="Search inventory..." wire:model.live.debounce.300ms="search" />
                 <x-button variant="secondary">Filters</x-button>
             </x-slot:toolbar>
 
@@ -105,7 +110,7 @@
             </x-slot:mobile>
 
             <x-slot:pagination>
-                <x-pagination />
+                <x-pagination :current-page="2" :last-page="8" :from="11" :to="20" :total="76" />
             </x-slot:pagination>
         </x-table>
 
