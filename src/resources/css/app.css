@@ -1,3 +1,51 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    :root {
+        --color-primary-50: 248 250 252;
+        --color-primary-100: 241 245 249;
+        --color-primary-200: 226 232 240;
+        --color-primary-300: 203 213 225;
+        --color-primary-400: 148 163 184;
+        --color-primary-500: 100 116 139;
+        --color-primary-600: 71 85 105;
+        --color-primary-700: 51 65 85;
+        --color-primary-800: 30 41 59;
+        --color-primary-900: 15 23 42;
+        --color-primary-950: 2 6 23;
+
+        --color-accent-50: 236 253 245;
+        --color-accent-100: 209 250 229;
+        --color-accent-200: 167 243 208;
+        --color-accent-300: 110 231 183;
+        --color-accent-400: 52 211 153;
+        --color-accent-500: 16 185 129;
+        --color-accent-600: 5 150 105;
+        --color-accent-700: 4 120 87;
+        --color-accent-800: 6 95 70;
+        --color-accent-900: 6 78 59;
+        --color-accent-950: 2 44 34;
+
+        --color-secondary-50: var(--color-accent-50);
+        --color-secondary-100: var(--color-accent-100);
+        --color-secondary-200: var(--color-accent-200);
+        --color-secondary-300: var(--color-accent-300);
+        --color-secondary-400: var(--color-accent-400);
+        --color-secondary-500: var(--color-accent-500);
+        --color-secondary-600: var(--color-accent-600);
+        --color-secondary-700: var(--color-accent-700);
+        --color-secondary-800: var(--color-accent-800);
+        --color-secondary-900: var(--color-accent-900);
+        --color-secondary-950: var(--color-accent-950);
+    }
+
+    html {
+        background: rgb(var(--color-primary-50));
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}

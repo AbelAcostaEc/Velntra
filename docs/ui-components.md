@@ -1,0 +1,146 @@
+# Velntra UI Components
+
+Sprint 02 defines a reusable Blade UI foundation for the administrative dashboard. Components live in `src/resources/views/components` and use Tailwind CSS, Alpine.js and Livewire-friendly attributes.
+
+## Design Tokens
+
+The palette is centralized in two places:
+
+- `src/resources/css/app.css`: CSS variables for RGB values.
+- `src/tailwind.config.js`: Tailwind color names mapped to those variables.
+
+Use `primary-*` for the main Slate palette and `accent-*` or `secondary-*` for the Emerald accent. To rebrand later, update the variables in `app.css`.
+
+## Layout
+
+```blade
+<x-app-layout>
+    <x-slot name="header">
+        <x-page-header title="Products" description="Manage sellable inventory.">
+            <x-slot:actions>
+                <x-button>Create product</x-button>
+            </x-slot:actions>
+        </x-page-header>
+    </x-slot>
+
+    Content here.
+</x-app-layout>
+```
+
+## Forms
+
+Inputs support labels, validation messages, placeholders, disabled, required and Livewire attributes.
+
+```blade
+<x-input label="Name" name="name" placeholder="Product name" required wire:model.defer="name" />
+
+<x-select label="Category" name="category_id" wire:model.defer="category_id">
+    <option value="">Select category</option>
+</x-select>
+
+<x-textarea label="Description" name="description" wire:model.defer="description" />
+
+<x-checkbox name="is_active" label="Available for sale" wire:model="is_active" />
+```
+
+Laravel Collective can render fields inside a `Form Section` when a custom helper is needed.
+
+```blade
+<x-form-section title="Product data" description="Basic product information.">
+    {!! Form::label('name', 'Name', ['class' => 'mb-1.5 block text-sm font-medium text-primary-700']) !!}
+    {!! Form::text('name', null, ['class' => 'block w-full rounded-xl border-primary-200 text-sm focus:border-accent-500 focus:ring-accent-500']) !!}
+</x-form-section>
+```
+
+## Buttons, Badges and Alerts
+
+```blade
+<x-button>Create</x-button>
+<x-button variant="secondary">Cancel</x-button>
+<x-button variant="danger" wire:click="delete">Delete</x-button>
+
+<x-badge variant="success">Active</x-badge>
+<x-alert variant="warning" title="Low stock">Review this product soon.</x-alert>
+```
+
+## Cards
+
+```blade
+<x-card title="Inventory" description="Current stock summary.">
+    Card content.
+</x-card>
+
+<x-stat-card label="Products" value="842" trend="18 low stock" variant="warning" />
+```
+
+## Tables and Mobile Cards
+
+Use `x-table` for the shared desktop/mobile pattern. Desktop rows go in the default slot. Mobile cards go in the `mobile` slot.
+
+```blade
+<x-table loading-target="search">
+    <x-slot:toolbar>
+        <x-search-input wire:model.live.debounce.300ms="search" />
+        <x-button variant="secondary">Filters</x-button>
+    </x-slot:toolbar>
+
+    <x-slot:head>
+        <tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-primary-500">Product</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-primary-500">Actions</th>
+        </tr>
+    </x-slot:head>
+
+    <tr>
+        <td class="px-4 py-4 text-sm text-primary-950">Barcode scanner</td>
+        <td class="px-4 py-4 text-right"><x-button variant="ghost" size="sm">Edit</x-button></td>
+    </tr>
+
+    <x-slot:mobile>
+        <article class="rounded-xl border border-primary-200 bg-white p-4 shadow-sm">
+            <h3 class="font-semibold text-primary-950">Barcode scanner</h3>
+            <p class="mt-1 text-sm text-primary-500">SKU-1001 · Stock: 24</p>
+        </article>
+    </x-slot:mobile>
+
+    <x-slot:pagination>
+        <x-pagination />
+    </x-slot:pagination>
+</x-table>
+```
+
+## Modals
+
+The modal listens for Alpine events and accepts Livewire loading attributes inside forms or actions.
+
+```blade
+<x-button x-on:click="$dispatch('open-modal', 'product-form')">Open</x-button>
+
+<x-modal name="product-form" title="Create product" description="Add a new inventory item.">
+    <form wire:submit.prevent="save" class="space-y-5 p-6">
+        <x-input label="Name" name="name" wire:model.defer="name" />
+        <div class="flex justify-end gap-2">
+            <x-button variant="secondary" x-on:click="$dispatch('close-modal', 'product-form')">Cancel</x-button>
+            <x-button type="submit" wire:loading.attr="disabled">Save</x-button>
+        </div>
+    </form>
+</x-modal>
+```
+
+## Empty States
+
+```blade
+<x-empty-state title="No products yet" description="Create the first product once the module is ready.">
+    <x-slot:action>
+        <x-button>Create product</x-button>
+    </x-slot:action>
+</x-empty-state>
+```
+
+## Styleguide
+
+The visual guide is available at:
+
+```text
+/dashboard/styleguide
+```
