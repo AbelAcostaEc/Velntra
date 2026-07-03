@@ -14,7 +14,17 @@
         @livewireStyles
     </head>
     <body class="bg-primary-50 font-sans text-primary-900 antialiased">
-        <div x-data="{ sidebarOpen: false, sidebarCollapsed: false }" class="min-h-screen">
+        <div
+            x-data="{
+                sidebarOpen: false,
+                sidebarCollapsed: localStorage.getItem('velntra.sidebarCollapsed') === 'true',
+                toggleSidebar() {
+                    this.sidebarCollapsed = ! this.sidebarCollapsed;
+                    localStorage.setItem('velntra.sidebarCollapsed', this.sidebarCollapsed);
+                },
+            }"
+            class="min-h-screen"
+        >
             <div
                 x-cloak
                 x-show="sidebarOpen"
@@ -68,7 +78,12 @@
                 </nav>
 
                 <div class="border-t border-primary-200 p-3">
-                    <button type="button" x-on:click="sidebarCollapsed = ! sidebarCollapsed" class="hidden w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900 lg:flex">
+                    <button
+                        type="button"
+                        x-on:click="toggleSidebar()"
+                        x-bind:title="sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+                        class="hidden w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900 lg:flex"
+                    >
                         <svg class="h-5 w-5 transition" x-bind:class="{ 'rotate-180': sidebarCollapsed }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 6 9 12l6 6"/></svg>
                         <span x-show="! sidebarCollapsed">Collapse</span>
                     </button>

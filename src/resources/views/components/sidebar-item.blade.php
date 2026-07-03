@@ -6,7 +6,7 @@
         : 'text-primary-600 hover:bg-primary-100 hover:text-primary-950';
 @endphp
 
-<a href="{{ $href }}" {{ $attributes->merge(['class' => 'group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition '.$classes.($nested ? ' ml-8' : '')]) }}>
+<a href="{{ $href }}" title="{{ $label }}" {{ $attributes->merge(['class' => 'group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition '.$classes.($nested ? ' ml-8' : '')]) }}>
     @if (! $nested)
         <span class="shrink-0">{{ $slot }}</span>
     @endif

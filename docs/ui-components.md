@@ -27,6 +27,18 @@ Use `primary-*` for the main Slate palette and `accent-*` or `secondary-*` for t
 </x-app-layout>
 ```
 
+The desktop sidebar can collapse to icon-only mode. The preference is stored in `localStorage` with the `velntra.sidebarCollapsed` key, so Livewire updates keep the selected state.
+
+## Language Selector
+
+The topbar includes a visual language selector with English and Spanish.
+
+```blade
+<x-language-select />
+```
+
+The selected value is stored locally with the `velntra.locale` key. It is ready to connect later to Laravel locale handling.
+
 ## Forms
 
 Inputs support labels, validation messages, placeholders, disabled, required and Livewire attributes.
