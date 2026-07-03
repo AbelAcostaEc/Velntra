@@ -59,7 +59,23 @@
         <x-table loading-target="search">
             <x-slot:toolbar>
                 <x-table-search placeholder="Search inventory..." wire:model.live.debounce.300ms="search" />
-                <x-button variant="secondary">Filters</x-button>
+                <x-filters-panel active-count="2" clear-action="clearFilters">
+                    <x-select label="Status" name="status" class="min-w-40">
+                        <option>All statuses</option>
+                        <option>Active</option>
+                        <option>Low stock</option>
+                    </x-select>
+                    <x-select label="Category" name="category" class="min-w-40">
+                        <option>All categories</option>
+                        <option>Accessories</option>
+                        <option>Hardware</option>
+                    </x-select>
+                    <x-select label="Stock" name="stock" class="min-w-40">
+                        <option>Any stock</option>
+                        <option>In stock</option>
+                        <option>Out of stock</option>
+                    </x-select>
+                </x-filters-panel>
             </x-slot:toolbar>
 
             <x-slot:filters>
@@ -87,25 +103,35 @@
                         <x-badge :variant="$item[3] === 'Active' ? 'success' : ($item[3] === 'Low stock' ? 'warning' : 'danger')">{{ $item[3] }}</x-badge>
                     </td>
                     <td class="px-4 py-4 text-right">
-                        <x-button variant="ghost" size="sm">Edit</x-button>
+                        <x-row-actions delete-modal="delete-demo" />
                     </td>
                 </tr>
             @endforeach
 
             <x-slot:mobile>
                 @foreach ([['Barcode scanner', 'SKU-1001', 24, 'Active'], ['Receipt printer', 'SKU-1002', 5, 'Low stock'], ['Cash drawer', 'SKU-1003', 0, 'Disabled']] as $item)
-                    <article class="rounded-xl border border-primary-200 bg-white p-4 shadow-sm">
-                        <div class="flex items-start justify-between gap-3">
+                    <x-mobile-record-card
+                        :title="$item[0]"
+                        subtitle="{{ $item[1] }}"
+                        :status="$item[3]"
+                        :status-variant="$item[3] === 'Active' ? 'success' : ($item[3] === 'Low stock' ? 'warning' : 'danger')"
+                    >
+                        <x-slot:meta>
                             <div>
-                                <h3 class="font-semibold text-primary-950">{{ $item[0] }}</h3>
-                                <p class="mt-1 text-sm text-primary-500">{{ $item[1] }} · Stock: {{ $item[2] }}</p>
+                                <dt class="text-primary-400">SKU</dt>
+                                <dd class="font-medium text-primary-800">{{ $item[1] }}</dd>
                             </div>
-                            <x-badge :variant="$item[3] === 'Active' ? 'success' : ($item[3] === 'Low stock' ? 'warning' : 'danger')">{{ $item[3] }}</x-badge>
-                        </div>
-                        <div class="mt-4 flex justify-end">
+                            <div>
+                                <dt class="text-primary-400">Stock</dt>
+                                <dd class="font-medium text-primary-800">{{ $item[2] }}</dd>
+                            </div>
+                        </x-slot:meta>
+                        <x-slot:actions>
+                            <x-button variant="secondary" size="sm">View</x-button>
                             <x-button variant="secondary" size="sm">Edit</x-button>
-                        </div>
-                    </article>
+                            <x-button variant="danger" size="sm" x-on:click="$dispatch('open-modal', 'delete-demo')">Delete</x-button>
+                        </x-slot:actions>
+                    </x-mobile-record-card>
                 @endforeach
             </x-slot:mobile>
 
@@ -113,6 +139,32 @@
                 <x-pagination :current-page="2" :last-page="8" :from="11" :to="20" :total="76" />
             </x-slot:pagination>
         </x-table>
+
+        <x-card title="States and loading">
+            <div class="grid gap-4 lg:grid-cols-3">
+                <x-state variant="forbidden" title="Access denied" description="You do not have permission to manage this resource." />
+                <x-state variant="error" title="Something went wrong" description="The records could not be loaded. Try refreshing the page." />
+                <x-skeleton type="card" />
+            </div>
+        </x-card>
+
+        <x-crud-page title="CRUD page convention" description="Use this structure for index pages with actions, summaries, responsive tables and modals.">
+            <x-slot:actions>
+                <x-button variant="secondary">Import</x-button>
+                <x-button x-on:click="$dispatch('open-modal', 'form-demo')">Create record</x-button>
+            </x-slot:actions>
+            <x-slot:summary>
+                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                    <x-stat-card label="Total records" value="842" trend="Demo data" variant="info" />
+                    <x-stat-card label="Active" value="798" trend="94.7%" variant="success" />
+                    <x-stat-card label="Draft" value="31" trend="Needs review" variant="warning" />
+                    <x-stat-card label="Archived" value="13" trend="Hidden" />
+                </div>
+            </x-slot:summary>
+            <x-slot:content>
+                <x-state title="Drop the table component here" description="Keep index, table, mobile card, create/edit modal and confirm dialog together." />
+            </x-slot:content>
+        </x-crud-page>
 
         <x-card title="Empty state">
             <x-empty-state title="No products yet" description="Create the first product once the Inventory module is implemented.">
@@ -137,13 +189,7 @@
         </form>
     </x-modal>
 
-    <x-modal name="delete-demo" max-width="md" title="Delete product" description="Example confirmation prepared for destructive Livewire actions.">
-        <div class="space-y-5 p-6">
-            <x-alert variant="danger">This is only a visual confirmation pattern. No record will be deleted.</x-alert>
-            <div class="flex justify-end gap-2">
-                <x-button variant="secondary" x-on:click="$dispatch('close-modal', 'delete-demo')">Cancel</x-button>
-                <x-button variant="danger" wire:click="delete" wire:loading.attr="disabled">Delete</x-button>
-            </div>
-        </div>
-    </x-modal>
+    <x-confirm-dialog name="delete-demo" title="Delete product" action="delete">
+        This is only a visual confirmation pattern. No record will be deleted from the demo.
+    </x-confirm-dialog>
 </x-app-layout>

@@ -128,7 +128,12 @@ Use `x-table` for the shared desktop/mobile pattern. Desktop rows go in the defa
 <x-table loading-target="search">
     <x-slot:toolbar>
         <x-table-search wire:model.live.debounce.300ms="search" />
-        <x-button variant="secondary">Filters</x-button>
+        <x-filters-panel active-count="2" clear-action="clearFilters">
+            <x-select label="Status" name="status" wire:model.live="status">
+                <option value="">All statuses</option>
+                <option value="active">Active</option>
+            </x-select>
+        </x-filters-panel>
     </x-slot:toolbar>
 
     <x-slot:head>
@@ -140,14 +145,22 @@ Use `x-table` for the shared desktop/mobile pattern. Desktop rows go in the defa
 
     <tr>
         <td class="px-4 py-4 text-sm text-primary-950">Barcode scanner</td>
-        <td class="px-4 py-4 text-right"><x-button variant="ghost" size="sm">Edit</x-button></td>
+        <td class="px-4 py-4 text-right"><x-row-actions delete-modal="delete-product" /></td>
     </tr>
 
     <x-slot:mobile>
-        <article class="rounded-xl border border-primary-200 bg-white p-4 shadow-sm">
-            <h3 class="font-semibold text-primary-950">Barcode scanner</h3>
-            <p class="mt-1 text-sm text-primary-500">SKU-1001 · Stock: 24</p>
-        </article>
+        <x-mobile-record-card title="Barcode scanner" subtitle="SKU-1001" status="Active" status-variant="success">
+            <x-slot:meta>
+                <div>
+                    <dt class="text-primary-400">Stock</dt>
+                    <dd class="font-medium text-primary-800">24</dd>
+                </div>
+            </x-slot:meta>
+            <x-slot:actions>
+                <x-button variant="secondary" size="sm">Edit</x-button>
+                <x-button variant="danger" size="sm" x-on:click="$dispatch('open-modal', 'delete-product')">Delete</x-button>
+            </x-slot:actions>
+        </x-mobile-record-card>
     </x-slot:mobile>
 
     <x-slot:pagination>
@@ -164,7 +177,49 @@ For non-paginator demos or custom adapters, pass simple values:
 <x-pagination :current-page="2" :last-page="8" :from="11" :to="20" :total="76" />
 ```
 
-## Modals
+## Table Filters
+
+`x-filters-panel` shows filters inline on desktop and as a collapsible panel on mobile.
+
+```blade
+<x-filters-panel active-count="1" clear-action="clearFilters">
+    <x-select label="Status" name="status" wire:model.live="status">
+        <option value="">All statuses</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+    </x-select>
+
+    <x-select label="Category" name="category_id" wire:model.live="category_id">
+        <option value="">All categories</option>
+    </x-select>
+</x-filters-panel>
+```
+
+## Row Actions
+
+Use `x-row-actions` for consistent View, Edit and Delete actions in desktop tables.
+
+```blade
+<x-row-actions
+    view-href="{{ route('products.show', $product) }}"
+    edit-href="{{ route('products.edit', $product) }}"
+    delete-modal="delete-product"
+/>
+```
+
+Custom actions can be passed through the `items` slot.
+
+```blade
+<x-row-actions>
+    <x-slot:items>
+        <button wire:click="duplicate({{ $product->id }})" class="block w-full px-4 py-2 text-left text-sm text-primary-600 hover:bg-primary-50">
+            Duplicate
+        </button>
+    </x-slot:items>
+</x-row-actions>
+```
+
+## Modals and Confirm Dialogs
 
 The modal listens for Alpine events and accepts Livewire loading attributes inside forms or actions.
 
@@ -182,6 +237,46 @@ The modal listens for Alpine events and accepts Livewire loading attributes insi
 </x-modal>
 ```
 
+For delete confirmations, prefer `x-confirm-dialog`.
+
+```blade
+<x-button variant="danger" x-on:click="$dispatch('open-modal', 'delete-product')">Delete</x-button>
+
+<x-confirm-dialog name="delete-product" title="Delete product" action="delete">
+    This action cannot be undone.
+</x-confirm-dialog>
+```
+
+## Standard States
+
+Use `x-state` for reusable empty, forbidden, error and success states.
+
+```blade
+<x-state
+    variant="forbidden"
+    title="Access denied"
+    description="You do not have permission to manage this resource."
+/>
+
+<x-state
+    variant="error"
+    title="Something went wrong"
+    description="The records could not be loaded. Try refreshing the page."
+/>
+```
+
+Use `x-skeleton` while Livewire loads content.
+
+```blade
+<div wire:loading>
+    <x-skeleton type="table" :rows="6" />
+</div>
+
+<div wire:loading.remove>
+    Loaded content.
+</div>
+```
+
 ## Empty States
 
 ```blade
@@ -190,6 +285,43 @@ The modal listens for Alpine events and accepts Livewire loading attributes insi
         <x-button>Create product</x-button>
     </x-slot:action>
 </x-empty-state>
+```
+
+## CRUD Page Convention
+
+Use this convention for CRUD screens:
+
+```text
+Modules/Inventory/resources/views/livewire/categories/index.blade.php
+Modules/Inventory/resources/views/livewire/categories/partials/table.blade.php
+Modules/Inventory/resources/views/livewire/categories/partials/mobile-card.blade.php
+Modules/Inventory/resources/views/livewire/categories/partials/form-modal.blade.php
+Modules/Inventory/resources/views/livewire/categories/partials/delete-dialog.blade.php
+```
+
+The page shell should follow this pattern:
+
+```blade
+<x-crud-page title="Categories" description="Organize products for reporting and search.">
+    <x-slot:actions>
+        <x-button x-on:click="$dispatch('open-modal', 'category-form')">Create category</x-button>
+    </x-slot:actions>
+
+    <x-slot:summary>
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <x-stat-card label="Total" value="{{ $total }}" />
+        </div>
+    </x-slot:summary>
+
+    <x-slot:content>
+        @include('inventory::livewire.categories.partials.table')
+    </x-slot:content>
+
+    <x-slot:modals>
+        @include('inventory::livewire.categories.partials.form-modal')
+        @include('inventory::livewire.categories.partials.delete-dialog')
+    </x-slot:modals>
+</x-crud-page>
 ```
 
 ## Styleguide
