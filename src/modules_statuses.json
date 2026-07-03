@@ -1,3 +1,9 @@
 {
-    "Administration": true
+    "Administration": true,
+    "Core": true,
+    "Settings": true,
+    "Sales": true,
+    "Inventory": true,
+    "Customers": true,
+    "Dashboard": true
 }
