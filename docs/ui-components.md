@@ -29,6 +29,19 @@ Use `primary-*` for the main Slate palette and `accent-*` or `secondary-*` for t
 
 The desktop sidebar can collapse to icon-only mode. The preference is stored in `localStorage` with the `velntra.sidebarCollapsed` key, so Livewire updates keep the selected state.
 
+## Guest Layout
+
+Authentication screens use `layouts.guest`. It is designed for Breeze and Livewire Volt pages such as login, registration, password reset, email verification and password confirmation.
+
+```php
+new #[Layout('layouts.guest')] class extends Component
+{
+    //
+};
+```
+
+The Breeze form components `x-text-input`, `x-input-label`, `x-input-error`, `x-primary-button`, `x-secondary-button`, `x-danger-button` and `x-auth-session-status` are styled to match the Velntra dashboard.
+
 ## Language Selector
 
 The topbar includes a visual language selector with English and Spanish.
