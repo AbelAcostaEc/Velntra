@@ -6,3 +6,6 @@ use Modules\Administration\Http\Controllers\AdministrationController;
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('administrations', AdministrationController::class)->names('administration');
 });
+
+// Logout
+Route::get('logout', [AdministrationController::class, 'logout'])->name('logout');

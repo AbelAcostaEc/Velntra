@@ -32,6 +32,7 @@
             <div class="border-t border-primary-100 py-1">
                 <a href="#" class="block px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 hover:text-primary-900">Profile</a>
                 <a href="#" class="block px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 hover:text-primary-900">Settings</a>
+                <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 hover:text-primary-900">Log Out</a>
             </div>
         </x-slot:content>
     </x-dropdown>

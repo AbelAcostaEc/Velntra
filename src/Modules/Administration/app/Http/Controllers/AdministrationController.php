@@ -53,4 +53,13 @@ class AdministrationController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy($id) {}
+
+    public function logout(Request $request)
+    {
+        auth()->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/');
+    }
 }
