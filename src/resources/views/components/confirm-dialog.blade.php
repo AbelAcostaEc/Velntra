@@ -8,6 +8,13 @@
     'maxWidth' => 'md',
 ])
 
+
+@php
+    $buttonAttributes = $action
+        ? ['wire:click' => $action]
+        : [];
+@endphp
+
 <x-modal :name="$name" :max-width="$maxWidth" :title="$title" :description="$description">
     <div class="space-y-5 p-6">
         <div class="flex gap-4 rounded-xl border border-red-200 bg-red-50 p-4">
@@ -24,7 +31,7 @@
             <x-button variant="secondary" x-on:click="$dispatch('close-modal', '{{ $name }}')">{{ $cancelLabel }}</x-button>
             <x-button
                 variant="danger"
-                @if ($action) wire:click="{{ $action }}" @endif
+                {{ $attributes->merge($buttonAttributes) }}
                 wire:loading.attr="disabled"
             >
                 <span wire:loading.remove>{{ $confirmLabel }}</span>
