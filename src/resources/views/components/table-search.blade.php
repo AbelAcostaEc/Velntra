@@ -17,7 +17,7 @@
             name="{{ $name }}"
             type="search"
             placeholder="{{ $placeholder }}"
-            x-model="value"
+            x-on:input="value = $event.target.value"
             {{ $attributes->merge(['class' => 'h-10 w-full rounded-xl border-primary-200 bg-white pl-9 pr-9 text-sm text-primary-900 shadow-sm placeholder:text-primary-400 focus:border-accent-500 focus:ring-accent-500 disabled:cursor-not-allowed disabled:bg-primary-100 disabled:text-primary-500']) }}
         >
 
@@ -26,7 +26,7 @@
                 type="button"
                 x-cloak
                 x-show="value.length > 0"
-                x-on:click="value = ''; $refs.input?.dispatchEvent(new Event('input', { bubbles: true }))"
+                x-on:click="value = ''; $refs.input.value = ''; $refs.input.dispatchEvent(new Event('input', { bubbles: true }))"
                 class="absolute right-2 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-lg text-primary-400 hover:bg-primary-100 hover:text-primary-700"
                 aria-label="Clear search"
             >
