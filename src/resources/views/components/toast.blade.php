@@ -55,6 +55,9 @@
             }[type] ?? 'M12 8h.01M11 12h1v4h1';
         },
     }"
+    @if(session()->has('toast'))
+        x-init="push(@js(session('toast')))"
+    @endif
     x-on:toast.window="push($event.detail)"
     class="pointer-events-none fixed z-[60] w-[calc(100%-2rem)] max-w-sm space-y-3 {{ $positions[$position] ?? $positions['top-right'] }}"
     aria-live="polite"
