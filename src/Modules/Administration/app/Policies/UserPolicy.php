@@ -2,12 +2,16 @@
 
 namespace Modules\Administration\Policies;
 
+// Models
 use Modules\Administration\Models\User;
 
 class UserPolicy
 {
     /**
-     * Determine whether the user can view any models.
+     * Determinar si el usuario autenticado puede ver el listado de usuarios.
+     *
+     * @param User $user
+     * @return bool
      */
     public function viewAny(User $user): bool
     {
@@ -15,7 +19,11 @@ class UserPolicy
     }
 
     /**
-     * Determine whether the user can view the model.
+     * Determinar si el usuario autenticado puede ver el detalle de un usuario.
+     *
+     * @param User $user
+     * @param User $model
+     * @return bool
      */
     public function view(User $user, User $model): bool
     {
@@ -23,7 +31,10 @@ class UserPolicy
     }
 
     /**
-     * Determine whether the user can create models.
+     * Determinar si el usuario autenticado puede crear nuevos usuarios.
+     *
+     * @param User $user
+     * @return bool
      */
     public function create(User $user): bool
     {
@@ -31,7 +42,11 @@ class UserPolicy
     }
 
     /**
-     * Determine whether the user can update the model.
+     * Determinar si el usuario autenticado puede actualizar el usuario especificado.
+     *
+     * @param User $user
+     * @param User $model
+     * @return bool
      */
     public function update(User $user, User $model): bool
     {
@@ -39,7 +54,11 @@ class UserPolicy
     }
 
     /**
-     * Determine whether the user can delete the model.
+     * Determinar si el usuario autenticado puede eliminar el usuario especificado.
+     *
+     * @param User $user
+     * @param User $model
+     * @return bool
      */
     public function delete(User $user, User $model): bool
     {
