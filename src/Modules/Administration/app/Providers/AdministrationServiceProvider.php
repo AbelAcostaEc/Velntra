@@ -5,8 +5,10 @@ namespace Modules\Administration\Providers;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Gate;
 use Modules\Administration\Models\User;
+use Modules\Administration\Policies\RolePolicy;
 use Modules\Administration\Policies\UserPolicy;
 use Nwidart\Modules\Support\ModuleServiceProvider;
+use Spatie\Permission\Models\Role;
 
 class AdministrationServiceProvider extends ModuleServiceProvider
 {
@@ -17,6 +19,7 @@ class AdministrationServiceProvider extends ModuleServiceProvider
      */
     protected array $policies = [
         User::class => UserPolicy::class,
+        Role::class => RolePolicy::class,
     ];
 
     /**

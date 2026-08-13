@@ -72,9 +72,10 @@
                         <x-sidebar-item href="#" label="Reports">
                             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5 19V5m0 14h14M9 15v-4m4 4V7m4 8V9"/></svg>
                         </x-sidebar-item>
-                        <x-sidebar-group label="Administration" :open="request()->is('users*')">
+                        <x-sidebar-group label="Administration" :open="request()->is('users*') || request()->is('roles*')">
                             <x-slot:icon><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 9a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-7 10a7 7 0 0 1 14 0M21.5 16.5l-1.5 1.5-1-1m2.5-2a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"/></svg></x-slot:icon>
                             <x-sidebar-item href="{{ route('users.index') }}" label="Users" :active="request()->routeIs('users.*')" nested />
+                            <x-sidebar-item href="{{ route('roles.index') }}" label="Roles" :active="request()->routeIs('roles.*')" nested />
                         </x-sidebar-group>
 
                         <x-sidebar-item href="#" label="Settings">
