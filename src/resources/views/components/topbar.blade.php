@@ -1,17 +1,21 @@
 <header {{ $attributes->merge(['class' => 'sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-primary-200 bg-white/85 px-4 backdrop-blur sm:px-6 lg:px-8']) }}>
     <button type="button" x-on:click="sidebarOpen = true" class="rounded-xl p-2 text-primary-500 hover:bg-primary-100 hover:text-primary-900 lg:hidden">
-        <span class="sr-only">Open sidebar</span>
-        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <span class="sr-only">{{ __t('nav_expand', 'administration') }}</span>
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
     </button>
 
     <div class="min-w-0 flex-1">
-        <x-search-input placeholder="Search products, customers, sales..." class="max-w-xl" />
+        <x-search-input :placeholder="__t('topbar_search_placeholder', 'administration')" class="max-w-xl" />
     </div>
 
     <x-language-select />
 
-    <x-button variant="ghost" size="icon" aria-label="Notifications">
-        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5m6 0a3 3 0 0 1-6 0"/></svg>
+    <x-button variant="ghost" size="icon" :aria-label="__t('topbar_notifications', 'administration')">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5m6 0a3 3 0 0 1-6 0" />
+        </svg>
     </x-button>
 
     <x-dropdown width="64">
@@ -30,9 +34,9 @@
                 <x-language-select name="mobile_locale" display="block" class="w-full" />
             </div>
             <div class="border-t border-primary-100 py-1">
-                <a href="#" class="block px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 hover:text-primary-900">Profile</a>
-                <a href="#" class="block px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 hover:text-primary-900">Settings</a>
-                <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 hover:text-primary-900">Log Out</a>
+                <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 hover:text-primary-900">{{ __t('topbar_profile', 'administration') }}</a>
+                <a href="#" class="block px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 hover:text-primary-900">{{ __t('topbar_settings', 'administration') }}</a>
+                <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 hover:text-primary-900">{{ __t('topbar_logout', 'administration') }}</a>
             </div>
         </x-slot:content>
     </x-dropdown>

@@ -127,4 +127,36 @@ return [
     'nav_collapse'                      => 'Plegar',
     'nav_expand'                        => 'Expandir',
     'nav_close_sidebar'                 => 'Cerrar menú lateral',
+
+    // Topbar
+    'topbar_search_placeholder'         => 'Buscar productos, clientes, ventas...',
+    'topbar_notifications'              => 'Notificaciones',
+    'topbar_profile'                    => 'Mi Perfil',
+    'topbar_settings'                   => 'Configuración',
+    'topbar_logout'                     => 'Cerrar Sesión',
+
+    // Profile Page
+    'profile_title'                     => 'Perfil de Usuario',
+    'profile_description'               => 'Administra tu información personal y opciones de seguridad.',
+    'profile_info_title'                => 'Información del Perfil',
+    'profile_info_description'          => 'Actualiza la información del perfil y la dirección de correo electrónico de tu cuenta.',
+    'profile_email_unverified'          => 'Tu dirección de correo electrónico no está verificada.',
+    'profile_resend_verification'       => 'Haz clic aquí para reenviar el correo de verificación.',
+    'profile_verification_sent'         => 'Se ha enviado un nuevo enlace de verificación a tu correo electrónico.',
+    'saved'                             => 'Guardado exitosamente.',
+
+    // Update Password
+    'profile_update_password_title'       => 'Actualizar Contraseña',
+    'profile_update_password_description' => 'Asegúrate de que tu cuenta utilice una contraseña segura para proteger tus datos.',
+    'profile_current_password'            => 'Contraseña Actual',
+    'profile_new_password'                => 'Nueva Contraseña',
+    'profile_confirm_password'            => 'Confirmar Contraseña',
+
+    // Delete Account
+    'profile_delete_account_title'               => 'Eliminar Cuenta',
+    'profile_delete_account_description'         => 'Una vez eliminada la cuenta, todos sus recursos y datos se perderán de manera permanente. Descarga cualquier dato importante antes de continuar.',
+    'profile_delete_account_button'              => 'Eliminar Cuenta',
+    'profile_delete_account_confirm_title'       => '¿Estás seguro de que deseas eliminar tu cuenta?',
+    'profile_delete_account_confirm_description' => 'Esta acción no se puede deshacer. Por favor, introduce tu contraseña actual para confirmar que deseas eliminar tu cuenta.',
+    'profile_delete_account_password_placeholder'=> 'Introduce tu contraseña actual',
 ];

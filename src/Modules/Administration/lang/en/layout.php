@@ -127,4 +127,36 @@ return [
     'nav_collapse'                      => 'Collapse',
     'nav_expand'                        => 'Expand',
     'nav_close_sidebar'                 => 'Close sidebar',
+
+    // Topbar
+    'topbar_search_placeholder'         => 'Search products, customers, sales...',
+    'topbar_notifications'              => 'Notifications',
+    'topbar_profile'                    => 'My Profile',
+    'topbar_settings'                   => 'Settings',
+    'topbar_logout'                     => 'Log Out',
+
+    // Profile Page
+    'profile_title'                     => 'User Profile',
+    'profile_description'               => 'Manage your personal information and account security options.',
+    'profile_info_title'                => 'Profile Information',
+    'profile_info_description'          => "Update your account's profile information and email address.",
+    'profile_email_unverified'          => 'Your email address is unverified.',
+    'profile_resend_verification'       => 'Click here to re-send the verification email.',
+    'profile_verification_sent'         => 'A new verification link has been sent to your email address.',
+    'saved'                             => 'Saved successfully.',
+
+    // Update Password
+    'profile_update_password_title'       => 'Update Password',
+    'profile_update_password_description' => 'Ensure your account is using a long, random password to stay secure.',
+    'profile_current_password'            => 'Current Password',
+    'profile_new_password'                => 'New Password',
+    'profile_confirm_password'            => 'Confirm Password',
+
+    // Delete Account
+    'profile_delete_account_title'               => 'Delete Account',
+    'profile_delete_account_description'         => 'Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.',
+    'profile_delete_account_button'              => 'Delete Account',
+    'profile_delete_account_confirm_title'       => 'Are you sure you want to delete your account?',
+    'profile_delete_account_confirm_description' => 'Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.',
+    'profile_delete_account_password_placeholder'=> 'Enter your password',
 ];

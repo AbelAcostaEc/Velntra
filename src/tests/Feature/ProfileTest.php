@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Volt\Volt;
+use Modules\Administration\Models\User;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
