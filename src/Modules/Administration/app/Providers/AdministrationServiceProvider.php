@@ -2,11 +2,41 @@
 
 namespace Modules\Administration\Providers;
 
-use Nwidart\Modules\Support\ModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\Gate;
+use Modules\Administration\Models\User;
+use Modules\Administration\Policies\UserPolicy;
+use Nwidart\Modules\Support\ModuleServiceProvider;
 
 class AdministrationServiceProvider extends ModuleServiceProvider
 {
+    /**
+     * Policies to register for the module.
+     *
+     * @var array<class-string, class-string>
+     */
+    protected array $policies = [
+        User::class => UserPolicy::class,
+    ];
+
+    /**
+     * Boot the application events.
+     */
+    public function boot(): void
+    {
+        parent::boot();
+        $this->registerPolicies();
+    }
+
+    /**
+     * Register module policies.
+     */
+    protected function registerPolicies(): void
+    {
+        foreach ($this->policies as $model => $policy) {
+            Gate::policy($model, $policy);
+        }
+    }
     /**
      * The name of the module.
      */

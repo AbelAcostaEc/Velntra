@@ -22,15 +22,15 @@
         @endif
     </div>
 
-    @isset($meta)
+    @if (isset($meta) && trim($meta->toHtml()) !== '')
         <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
             {{ $meta }}
         </dl>
-    @endisset
+    @endif
 
-    @isset($actions)
+    @if (isset($actions) && trim($actions->toHtml()) !== '')
         <div class="mt-4 flex items-center justify-end gap-2 border-t border-primary-100 pt-4">
             {{ $actions }}
         </div>
-    @endisset
+    @endif
 </article>

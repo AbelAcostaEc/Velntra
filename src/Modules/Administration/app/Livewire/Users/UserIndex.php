@@ -6,6 +6,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Modules\Administration\Models\User;
+use Modules\Administration\Services\UserService;
 use Spatie\Permission\Models\Role;
 
 #[Layout('layouts.app')]
@@ -50,6 +51,8 @@ class UserIndex extends Component
 
     public function openCreateModal(): void
     {
+        $this->authorize('create', User::class);
+
         $this->reset(['selectedUserId', 'name', 'email', 'password', 'selectedRoles']);
         $this->selectedRoles = [];
         $this->resetValidation();
@@ -58,6 +61,8 @@ class UserIndex extends Component
     public function openEditModal(int $userId): void
     {
         $user = User::findOrFail($userId);
+        $this->authorize('update', $user);
+
         $this->selectedUserId = $user->id;
         $this->name = $user->name;
         $this->email = $user->email;
@@ -68,31 +73,31 @@ class UserIndex extends Component
 
     public function openDeleteModal(int $userId): void
     {
-        $this->selectedUserId = $userId;
+        $user = User::findOrFail($userId);
+        $this->authorize('delete', $user);
+
+        $this->selectedUserId = $user->id;
     }
 
-    public function save(): void
+    public function save(UserService $userService): void
     {
         $this->validate();
 
+        $userData = [
+            'name'     => $this->name,
+            'email'    => $this->email,
+            'password' => $this->password,
+        ];
+
         if ($this->selectedUserId) {
             $user = User::findOrFail($this->selectedUserId);
-            $data = [
-                'name'  => $this->name,
-                'email' => $this->email,
-            ];
-            if (!empty($this->password)) {
-                $data['password'] = bcrypt($this->password);
-            }
-            $user->update($data);
-            $user->syncRoles($this->selectedRoles);
+            $this->authorize('update', $user);
+
+            $userService->update($user, $userData, $this->selectedRoles);
         } else {
-            $user = User::create([
-                'name'     => $this->name,
-                'email'    => $this->email,
-                'password' => bcrypt($this->password),
-            ]);
-            $user->syncRoles($this->selectedRoles);
+            $this->authorize('create', User::class);
+
+            $userService->create($userData, $this->selectedRoles);
         }
 
         $this->reset(['selectedUserId', 'name', 'email', 'password', 'selectedRoles']);
@@ -100,17 +105,23 @@ class UserIndex extends Component
         $this->dispatch('close-modal', 'user-form');
     }
 
-    public function delete(): void
+    public function delete(UserService $userService): void
     {
         if ($this->selectedUserId) {
-            User::destroy($this->selectedUserId);
+            $user = User::findOrFail($this->selectedUserId);
+            $this->authorize('delete', $user);
+
+            $userService->delete($user);
         }
+
         $this->reset(['selectedUserId']);
         $this->dispatch('close-modal', 'delete-user');
     }
 
     public function render()
     {
+        $this->authorize('viewAny', User::class);
+
         $users = User::query()
             ->with('roles')
             ->when($this->search, fn($q) => $q->where('name', 'like', "%{$this->search}%")->orWhere('email', 'like', "%{$this->search}%"))

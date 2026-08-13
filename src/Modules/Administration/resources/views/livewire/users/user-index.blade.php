@@ -1,15 +1,17 @@
 <div>
     <x-crud-page :title="__t('users_management', 'administration')" :description="__t('users_management_description', 'administration')">
         <x-slot:actions>
-            <x-button
-                wire:click="openCreateModal"
-                x-on:click="$dispatch('open-modal', 'user-form')"
-                wire:loading.attr="disabled">
-                <svg class="h-4 w-4 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                </svg>
-                {{ __t('create_user', 'administration') }}
-            </x-button>
+            @can('create', \Modules\Administration\Models\User::class)
+                <x-button
+                    wire:click="openCreateModal"
+                    x-on:click="$dispatch('open-modal', 'user-form')"
+                    wire:loading.attr="disabled">
+                    <svg class="h-4 w-4 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    {{ __t('create_user', 'administration') }}
+                </x-button>
+            @endcan
         </x-slot:actions>
 
         <x-slot:summary>
@@ -48,20 +50,24 @@
                         </td>
                         <td class="px-4 py-4 text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <x-button
-                                    variant="secondary"
-                                    size="sm"
-                                    wire:click="openEditModal({{ $user->id }})"
-                                    x-on:click="$dispatch('open-modal', 'user-form')">
-                                    {{ __t('edit', 'administration') }}
-                                </x-button>
-                                <x-button
-                                    variant="danger"
-                                    size="sm"
-                                    wire:click="openDeleteModal({{ $user->id }})"
-                                    x-on:click="$dispatch('open-modal', 'delete-user')">
-                                    {{ __t('delete', 'administration') }}
-                                </x-button>
+                                @can('update', $user)
+                                    <x-button
+                                        variant="secondary"
+                                        size="sm"
+                                        wire:click="openEditModal({{ $user->id }})"
+                                        x-on:click="$dispatch('open-modal', 'user-form')">
+                                        {{ __t('edit', 'administration') }}
+                                    </x-button>
+                                @endcan
+                                @can('delete', $user)
+                                    <x-button
+                                        variant="danger"
+                                        size="sm"
+                                        wire:click="openDeleteModal({{ $user->id }})"
+                                        x-on:click="$dispatch('open-modal', 'delete-user')">
+                                        {{ __t('delete', 'administration') }}
+                                    </x-button>
+                                @endcan
                             </div>
                         </td>
                     </tr>
@@ -93,20 +99,24 @@
                             </x-slot:status>
 
                             <x-slot:actions>
-                                <x-button
-                                    variant="secondary"
-                                    size="sm"
-                                    wire:click="openEditModal({{ $user->id }})"
-                                    x-on:click="$dispatch('open-modal', 'user-form')">
-                                    {{ __t('edit', 'administration') }}
-                                </x-button>
-                                <x-button
-                                    variant="danger"
-                                    size="sm"
-                                    wire:click="openDeleteModal({{ $user->id }})"
-                                    x-on:click="$dispatch('open-modal', 'delete-user')">
-                                    {{ __t('delete', 'administration') }}
-                                </x-button>
+                                @can('update', $user)
+                                    <x-button
+                                        variant="secondary"
+                                        size="sm"
+                                        wire:click="openEditModal({{ $user->id }})"
+                                        x-on:click="$dispatch('open-modal', 'user-form')">
+                                        {{ __t('edit', 'administration') }}
+                                    </x-button>
+                                @endcan
+                                @can('delete', $user)
+                                    <x-button
+                                        variant="danger"
+                                        size="sm"
+                                        wire:click="openDeleteModal({{ $user->id }})"
+                                        x-on:click="$dispatch('open-modal', 'delete-user')">
+                                        {{ __t('delete', 'administration') }}
+                                    </x-button>
+                                @endcan
                             </x-slot:actions>
                         </x-mobile-record-card>
                     @endforeach
