@@ -48,4 +48,9 @@ return [
     // Delete modal
     'delete_user_title'              => 'Delete User',
     'delete_user_description'        => 'Are you sure you want to delete this user? This action cannot be undone.',
+
+    // Toast notifications
+    'user_created'                   => 'User created successfully.',
+    'user_updated'                   => 'User updated successfully.',
+    'user_deleted'                   => 'User deleted successfully.',
 ];

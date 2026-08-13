@@ -151,7 +151,8 @@ class UserManagementTest extends TestCase
             ->set('selectedRoles', ['admin', 'seller'])
             ->call('save')
             ->assertHasNoErrors()
-            ->assertDispatched('close-modal', 'user-form');
+            ->assertDispatched('close-modal', 'user-form')
+            ->assertDispatched('toast');
 
         $this->assertDatabaseHas('users', ['email' => 'livewire@velntra.test']);
         $created = User::where('email', 'livewire@velntra.test')->first();
@@ -177,7 +178,8 @@ class UserManagementTest extends TestCase
             ->assertSet('password', '')
             ->set('name', 'Target Edited')
             ->call('save')
-            ->assertHasNoErrors();
+            ->assertHasNoErrors()
+            ->assertDispatched('toast');
 
         $this->assertEquals('Target Edited', $targetUser->fresh()->name);
     }
@@ -195,7 +197,8 @@ class UserManagementTest extends TestCase
         Livewire::test(UserIndex::class)
             ->call('openDeleteModal', $targetUser->id)
             ->call('delete')
-            ->assertDispatched('close-modal', 'delete-user');
+            ->assertDispatched('close-modal', 'delete-user')
+            ->assertDispatched('toast');
 
         $this->assertDatabaseMissing('users', ['id' => $targetUser->id]);
     }
@@ -205,7 +208,7 @@ class UserManagementTest extends TestCase
         $this->actingAs($this->adminUser);
 
         Livewire::test(UserIndex::class)
-            ->assertSeeHtml('openCreateModal')
+            ->assertSeeHtml('wire:click="openCreateModal"')
             ->assertSeeHtml('openEditModal')
             ->assertSeeHtml('openDeleteModal');
     }
@@ -223,8 +226,8 @@ class UserManagementTest extends TestCase
 
         Livewire::test(UserIndex::class)
             ->assertStatus(200)
-            ->assertDontSeeHtml('openCreateModal')
-            ->assertDontSeeHtml('openEditModal')
-            ->assertDontSeeHtml('openDeleteModal');
+            ->assertDontSeeHtml('wire:click="openCreateModal"')
+            ->assertDontSeeHtml('wire:click="openEditModal')
+            ->assertDontSeeHtml('wire:click="openDeleteModal');
     }
 }

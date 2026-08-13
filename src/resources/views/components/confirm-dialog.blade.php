@@ -6,8 +6,8 @@
     'cancelLabel' => 'Cancel',
     'action' => null,
     'maxWidth' => 'md',
+    'loadingTarget' => null,
 ])
-
 
 @php
     $buttonAttributes = $action
@@ -15,7 +15,7 @@
         : [];
 @endphp
 
-<x-modal :name="$name" :max-width="$maxWidth" :title="$title" :description="$description">
+<x-modal :name="$name" :max-width="$maxWidth" :title="$title" :description="$description" :loading-target="$loadingTarget">
     <div class="space-y-5 p-6">
         <div class="flex gap-4 rounded-xl border border-red-200 bg-red-50 p-4">
             <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-red-100 text-red-700">
@@ -34,8 +34,8 @@
                 {{ $attributes->merge($buttonAttributes) }}
                 wire:loading.attr="disabled"
             >
-                <span wire:loading.remove>{{ $confirmLabel }}</span>
-                <span wire:loading>Processing...</span>
+                <span wire:loading.remove @if($action) wire:target="{{ $action }}" @endif>{{ $confirmLabel }}</span>
+                <span wire:loading @if($action) wire:target="{{ $action }}" @endif>Processing...</span>
             </x-button>
         </div>
     </div>

@@ -48,4 +48,9 @@ return [
     // Delete modal
     'delete_user_title'              => 'Eliminar Usuario',
     'delete_user_description'        => '¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.',
+
+    // Toast notifications
+    'user_created'                   => 'Usuario creado exitosamente.',
+    'user_updated'                   => 'Usuario actualizado exitosamente.',
+    'user_deleted'                   => 'Usuario eliminado exitosamente.',
 ];

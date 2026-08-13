@@ -1,4 +1,4 @@
-@props(['name', 'show' => false, 'maxWidth' => '2xl', 'title' => null, 'description' => null])
+@props(['name', 'show' => false, 'maxWidth' => '2xl', 'title' => null, 'description' => null, 'loadingTarget' => null])
 
 @php
     $maxWidth = [
@@ -41,8 +41,23 @@
             </div>
         @endif
 
-        <div wire:loading.class="opacity-60 pointer-events-none">
-            {{ $slot }}
+        <div class="relative">
+            @if ($loadingTarget)
+                <div
+                    wire:loading.flex
+                    wire:target="{{ $loadingTarget }}"
+                    class="absolute inset-0 z-20 hidden items-center justify-center bg-white/80 backdrop-blur-sm"
+                >
+                    <div class="flex flex-col items-center gap-3">
+                        <div class="h-9 w-9 animate-spin rounded-full border-2 border-primary-200 border-t-accent-600"></div>
+                        <span class="text-xs font-medium text-primary-500">{{ __('Cargando...') }}</span>
+                    </div>
+                </div>
+            @endif
+
+            <div @if($loadingTarget) wire:loading.class="opacity-40 pointer-events-none" wire:target="{{ $loadingTarget }}" @else wire:loading.class="opacity-60 pointer-events-none" @endif>
+                {{ $slot }}
+            </div>
         </div>
     </div>
 </div>

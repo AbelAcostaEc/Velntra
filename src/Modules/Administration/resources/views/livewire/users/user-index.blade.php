@@ -135,7 +135,8 @@
     <x-modal
         name="user-form"
         :title="$selectedUserId ? __t('edit_user', 'administration') : __t('create_user', 'administration')"
-        :description="__t('form_description', 'administration')">
+        :description="__t('form_description', 'administration')"
+        loading-target="openCreateModal, openEditModal">
         <form wire:submit.prevent="save" class="space-y-5 p-6">
             <x-input
                 :label="__t('field_name', 'administration')"
@@ -208,5 +209,6 @@
         :description="__t('delete_user_description', 'administration')"
         :confirm-label="__t('delete', 'administration')"
         :cancel-label="__t('cancel', 'administration')"
-        action="delete" />
+        action="delete"
+        loading-target="openDeleteModal, delete" />
 </div>

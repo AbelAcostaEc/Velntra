@@ -13,6 +13,13 @@
     x-data="{
         toasts: [],
         push(toast) {
+            if (Array.isArray(toast) && toast.length > 0) {
+                toast = toast[0];
+            } else if (toast && toast[0] && typeof toast[0] === 'object') {
+                toast = toast[0];
+            }
+            if (!toast) return;
+
             const id = toast.id ?? Date.now() + Math.random();
             const item = {
                 id,

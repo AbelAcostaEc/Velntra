@@ -154,11 +154,23 @@ class UserIndex extends Component
             $this->authorize('update', $user);
 
             $userService->update($user, $userData, $this->selectedRoles);
+
+            // Notificación toast de éxito al editar
+            $this->dispatch('toast', [
+                'type'    => 'success',
+                'message' => __t('user_updated', 'administration'),
+            ]);
         } else {
             // Creación de nuevo usuario
             $this->authorize('create', User::class);
 
             $userService->create($userData, $this->selectedRoles);
+
+            // Notificación toast de éxito al crear
+            $this->dispatch('toast', [
+                'type'    => 'success',
+                'message' => __t('user_created', 'administration'),
+            ]);
         }
 
         // Limpiar estado y cerrar modal
@@ -178,6 +190,12 @@ class UserIndex extends Component
             $this->authorize('delete', $user);
 
             $userService->delete($user);
+
+            // Notificación toast de éxito al eliminar
+            $this->dispatch('toast', [
+                'type'    => 'success',
+                'message' => __t('user_deleted', 'administration'),
+            ]);
         }
 
         // Limpiar selección y cerrar modal de confirmación
