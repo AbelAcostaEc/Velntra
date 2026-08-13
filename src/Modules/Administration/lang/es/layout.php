@@ -111,4 +111,20 @@ return [
     'module_customers'                  => 'Clientes',
     'module_sales'                      => 'Ventas',
     'module_settings'                   => 'Configuración',
+
+    // Navigation Menu
+    'nav_dashboard'                     => 'Panel de Control',
+    'nav_inventory'                     => 'Inventario',
+    'nav_categories'                    => 'Categorías',
+    'nav_products'                      => 'Productos',
+    'nav_customers'                     => 'Clientes',
+    'nav_sales'                         => 'Ventas',
+    'nav_reports'                       => 'Reportes',
+    'nav_administration'                => 'Administración',
+    'nav_users'                         => 'Usuarios',
+    'nav_roles'                         => 'Roles',
+    'nav_settings'                      => 'Configuración',
+    'nav_collapse'                      => 'Plegar',
+    'nav_expand'                        => 'Expandir',
+    'nav_close_sidebar'                 => 'Cerrar menú lateral',
 ];

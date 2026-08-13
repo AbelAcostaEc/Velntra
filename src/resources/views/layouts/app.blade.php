@@ -46,41 +46,66 @@
                     </a>
 
                     <button type="button" x-on:click="sidebarOpen = false" class="rounded-lg p-2 text-primary-500 hover:bg-primary-100 hover:text-primary-800 lg:hidden">
-                        <span class="sr-only">Close sidebar</span>
+                        <span class="sr-only">{{ __t('nav_close_sidebar', 'administration') }}</span>
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
 
                 <nav class="flex-1 space-y-6 overflow-y-auto px-3 py-5">
                     <div class="space-y-1">
-                        <x-sidebar-item href="{{ route('dashboard') }}" label="Dashboard" :active="request()->routeIs('dashboard')">
-                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.2V6.8A2.8 2.8 0 0 1 5.8 4h3.4A2.8 2.8 0 0 1 12 6.8v6.4A2.8 2.8 0 0 1 9.2 16H5.8A2.8 2.8 0 0 1 3 13.2ZM12 17.2v-6.4A2.8 2.8 0 0 1 14.8 8h3.4a2.8 2.8 0 0 1 2.8 2.8v6.4a2.8 2.8 0 0 1-2.8 2.8h-3.4a2.8 2.8 0 0 1-2.8-2.8Z"/></svg>
-                        </x-sidebar-item>
+                        @can('dashboard.view')
+                            <x-sidebar-item href="{{ route('dashboard') }}" :label="__t('nav_dashboard', 'administration')" :active="request()->routeIs('dashboard*')">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.2V6.8A2.8 2.8 0 0 1 5.8 4h3.4A2.8 2.8 0 0 1 12 6.8v6.4A2.8 2.8 0 0 1 9.2 16H5.8A2.8 2.8 0 0 1 3 13.2ZM12 17.2v-6.4A2.8 2.8 0 0 1 14.8 8h3.4a2.8 2.8 0 0 1 2.8 2.8v6.4a2.8 2.8 0 0 1-2.8 2.8h-3.4a2.8 2.8 0 0 1-2.8-2.8Z"/></svg>
+                            </x-sidebar-item>
+                        @endcan
 
-                        <x-sidebar-group label="Inventory" :open="request()->is('inventory*')">
-                            <x-slot:icon><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7.5 12 3l8 4.5M4 7.5v9L12 21m-8-13.5 8 4.5m8-4.5v9L12 21m8-13.5-8 4.5m0 0V21"/></svg></x-slot:icon>
-                            <x-sidebar-item href="#" label="Categories" nested />
-                            <x-sidebar-item href="#" label="Products" nested />
-                        </x-sidebar-group>
+                        @canany(['users.view', 'roles.view'])
+                            <x-sidebar-group :label="__t('nav_administration', 'administration')" :open="request()->routeIs('users.*', 'roles.*', 'administration.*')">
+                                <x-slot:icon><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 9a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-7 10a7 7 0 0 1 14 0M21.5 16.5l-1.5 1.5-1-1m2.5-2a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"/></svg></x-slot:icon>
+                                @can('users.view')
+                                    <x-sidebar-item href="{{ route('users.index') }}" :label="__t('nav_users', 'administration')" :active="request()->routeIs('users.*')" nested />
+                                @endcan
+                                @can('roles.view')
+                                    <x-sidebar-item href="{{ route('roles.index') }}" :label="__t('nav_roles', 'administration')" :active="request()->routeIs('roles.*')" nested />
+                                @endcan
+                            </x-sidebar-group>
+                        @endcanany
 
-                        <x-sidebar-item href="#" label="Customers">
-                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M16 19a4 4 0 0 0-8 0M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6.5 5.5c.9-.7 1.5-1.8 1.5-3a3.5 3.5 0 0 0-5.2-3.1M5.5 18.5a3.7 3.7 0 0 1-1.5-3 3.5 3.5 0 0 1 5.2-3.1"/></svg>
-                        </x-sidebar-item>
-                        <x-sidebar-item href="#" label="Sales">
-                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h15l-2 8H8L6 6Zm0 0-.7-3H3m6 18a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm9 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/></svg>
-                        </x-sidebar-item>
-                        <x-sidebar-item href="#" label="Reports">
-                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5 19V5m0 14h14M9 15v-4m4 4V7m4 8V9"/></svg>
-                        </x-sidebar-item>
-                        <x-sidebar-group label="Administration" :open="request()->is('users*') || request()->is('roles*')">
-                            <x-slot:icon><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 9a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-7 10a7 7 0 0 1 14 0M21.5 16.5l-1.5 1.5-1-1m2.5-2a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"/></svg></x-slot:icon>
-                            <x-sidebar-item href="{{ route('users.index') }}" label="Users" :active="request()->routeIs('users.*')" nested />
-                            <x-sidebar-item href="{{ route('roles.index') }}" label="Roles" :active="request()->routeIs('roles.*')" nested />
-                        </x-sidebar-group>
+                        @canany(['categories.view', 'products.view'])
+                            <x-sidebar-group :label="__t('nav_inventory', 'administration')" :open="request()->routeIs('inventory.*', 'categories.*', 'products.*')">
+                                <x-slot:icon><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7.5 12 3l8 4.5M4 7.5v9L12 21m-8-13.5 8 4.5m8-4.5v9L12 21m8-13.5-8 4.5m0 0V21"/></svg></x-slot:icon>
+                                @can('categories.view')
+                                    <x-sidebar-item href="{{ Route::has('categories.index') ? route('categories.index') : '#' }}" :label="__t('nav_categories', 'administration')" :active="request()->routeIs('categories.*')" nested />
+                                @endcan
+                                @can('products.view')
+                                    <x-sidebar-item href="{{ Route::has('products.index') ? route('products.index') : '#' }}" :label="__t('nav_products', 'administration')" :active="request()->routeIs('products.*')" nested />
+                                @endcan
+                            </x-sidebar-group>
+                        @endcanany
 
-                        <x-sidebar-item href="#" label="Settings">
-                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm7-3.5a7 7 0 0 0-.1-1l2-1.5-2-3.5-2.4 1a7.2 7.2 0 0 0-1.8-1L14.4 3h-4.8l-.3 3a7.2 7.2 0 0 0-1.8 1L5.1 6 3 9.5 5.1 11a7 7 0 0 0 0 2L3 14.5 5.1 18l2.4-1a7.2 7.2 0 0 0 1.8 1l.3 3h4.8l.3-3a7.2 7.2 0 0 0 1.8-1l2.4 1 2.1-3.5-2.1-1.5c.1-.3.1-.7.1-1Z"/></svg>
-                        </x-sidebar-item>
+                        @can('customers.view')
+                            <x-sidebar-item href="{{ Route::has('customers.index') ? route('customers.index') : '#' }}" :label="__t('nav_customers', 'administration')" :active="request()->routeIs('customers.*')">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M16 19a4 4 0 0 0-8 0M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6.5 5.5c.9-.7 1.5-1.8 1.5-3a3.5 3.5 0 0 0-5.2-3.1M5.5 18.5a3.7 3.7 0 0 1-1.5-3 3.5 3.5 0 0 1 5.2-3.1"/></svg>
+                            </x-sidebar-item>
+                        @endcan
+
+                        @can('sales.view')
+                            <x-sidebar-item href="{{ Route::has('sales.index') ? route('sales.index') : '#' }}" :label="__t('nav_sales', 'administration')" :active="request()->routeIs('sales.*')">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h15l-2 8H8L6 6Zm0 0-.7-3H3m6 18a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm9 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/></svg>
+                            </x-sidebar-item>
+                        @endcan
+
+                        @canany(['reports.view', 'sales.view'])
+                            <x-sidebar-item href="{{ Route::has('reports.index') ? route('reports.index') : '#' }}" :label="__t('nav_reports', 'administration')" :active="request()->routeIs('reports.*')">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5 19V5m0 14h14M9 15v-4m4 4V7m4 8V9"/></svg>
+                            </x-sidebar-item>
+                        @endcanany
+
+                        @canany(['settings.view', 'settings.update'])
+                            <x-sidebar-item href="{{ Route::has('settings.index') ? route('settings.index') : '#' }}" :label="__t('nav_settings', 'administration')" :active="request()->routeIs('settings.*')">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm7-3.5a7 7 0 0 0-.1-1l2-1.5-2-3.5-2.4 1a7.2 7.2 0 0 0-1.8-1L14.4 3h-4.8l-.3 3a7.2 7.2 0 0 0-1.8 1L5.1 6 3 9.5 5.1 11a7 7 0 0 0 0 2L3 14.5 5.1 18l2.4-1a7.2 7.2 0 0 0 1.8 1l.3 3h4.8l.3-3a7.2 7.2 0 0 0 1.8-1l2.4 1 2.1-3.5-2.1-1.5c.1-.3.1-.7.1-1Z"/></svg>
+                            </x-sidebar-item>
+                        @endcanany
                     </div>
                 </nav>
 
@@ -88,11 +113,11 @@
                     <button
                         type="button"
                         x-on:click="toggleSidebar()"
-                        x-bind:title="sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+                        x-bind:title="sidebarCollapsed ? '{{ __t('nav_expand', 'administration') }}' : '{{ __t('nav_collapse', 'administration') }}'"
                         class="hidden w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900 lg:flex"
                     >
                         <svg class="h-5 w-5 transition" x-bind:class="{ 'rotate-180': sidebarCollapsed }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 6 9 12l6 6"/></svg>
-                        <span x-show="! sidebarCollapsed">Collapse</span>
+                        <span x-show="! sidebarCollapsed">{{ __t('nav_collapse', 'administration') }}</span>
                     </button>
                 </div>
             </aside>

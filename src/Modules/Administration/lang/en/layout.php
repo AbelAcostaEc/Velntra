@@ -111,4 +111,20 @@ return [
     'module_customers'                  => 'Customers',
     'module_sales'                      => 'Sales',
     'module_settings'                   => 'Settings',
+
+    // Navigation Menu
+    'nav_dashboard'                     => 'Dashboard',
+    'nav_inventory'                     => 'Inventory',
+    'nav_categories'                    => 'Categories',
+    'nav_products'                      => 'Products',
+    'nav_customers'                     => 'Customers',
+    'nav_sales'                         => 'Sales',
+    'nav_reports'                       => 'Reports',
+    'nav_administration'                => 'Administration',
+    'nav_users'                         => 'Users',
+    'nav_roles'                         => 'Roles',
+    'nav_settings'                      => 'Settings',
+    'nav_collapse'                      => 'Collapse',
+    'nav_expand'                        => 'Expand',
+    'nav_close_sidebar'                 => 'Close sidebar',
 ];
