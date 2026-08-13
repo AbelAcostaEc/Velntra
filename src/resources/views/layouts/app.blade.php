@@ -72,6 +72,11 @@
                         <x-sidebar-item href="#" label="Reports">
                             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5 19V5m0 14h14M9 15v-4m4 4V7m4 8V9"/></svg>
                         </x-sidebar-item>
+                        <x-sidebar-group label="Administration" :open="request()->is('users*')">
+                            <x-slot:icon><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 9a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-7 10a7 7 0 0 1 14 0M21.5 16.5l-1.5 1.5-1-1m2.5-2a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"/></svg></x-slot:icon>
+                            <x-sidebar-item href="{{ route('users.index') }}" label="Users" :active="request()->routeIs('users.*')" nested />
+                        </x-sidebar-group>
+
                         <x-sidebar-item href="#" label="Settings">
                             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm7-3.5a7 7 0 0 0-.1-1l2-1.5-2-3.5-2.4 1a7.2 7.2 0 0 0-1.8-1L14.4 3h-4.8l-.3 3a7.2 7.2 0 0 0-1.8 1L5.1 6 3 9.5 5.1 11a7 7 0 0 0 0 2L3 14.5 5.1 18l2.4-1a7.2 7.2 0 0 0 1.8 1l.3 3h4.8l.3-3a7.2 7.2 0 0 0 1.8-1l2.4 1 2.1-3.5-2.1-1.5c.1-.3.1-.7.1-1Z"/></svg>
                         </x-sidebar-item>

@@ -20,7 +20,12 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [];
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'email_verified_at',
+    ];
 
     protected function casts(): array
     {

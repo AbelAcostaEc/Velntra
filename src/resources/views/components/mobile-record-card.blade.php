@@ -13,7 +13,11 @@
                 <p class="mt-1 text-sm text-primary-500">{{ $subtitle }}</p>
             @endif
         </div>
-        @if ($status)
+        @if (isset($status) && $status instanceof \Illuminate\View\ComponentSlot && $status->isNotEmpty())
+            <div class="flex flex-wrap items-center justify-end gap-1.5">
+                {{ $status }}
+            </div>
+        @elseif ($status)
             <x-badge :variant="$statusVariant">{{ $status }}</x-badge>
         @endif
     </div>
