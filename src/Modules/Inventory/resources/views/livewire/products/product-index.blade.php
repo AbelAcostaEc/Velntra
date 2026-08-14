@@ -70,11 +70,24 @@
                                 {{ $product->sku }}
                             </span>
                         </td>
-                        <td class="px-4 py-4 text-sm font-semibold text-primary-950">
-                            <div>{{ $product->name }}</div>
-                            @if($product->barcode)
-                                <div class="text-xs font-mono font-normal text-primary-500">{{ $product->barcode }}</div>
-                            @endif
+                        <td class="px-4 py-4 text-sm">
+                            <div class="flex items-center gap-3">
+                                @if($product->image_url)
+                                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="h-10 w-10 shrink-0 rounded-lg object-cover border border-primary-200 shadow-sm" />
+                                @else
+                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-100 text-primary-400">
+                                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                                        </svg>
+                                    </div>
+                                @endif
+                                <div class="min-w-0">
+                                    <div class="font-semibold text-primary-950 truncate">{{ $product->name }}</div>
+                                    @if($product->barcode)
+                                        <div class="text-xs font-mono font-normal text-primary-500">{{ $product->barcode }}</div>
+                                    @endif
+                                </div>
+                            </div>
                         </td>
                         <td class="px-4 py-4">
                             <div class="flex flex-wrap gap-1">
@@ -198,6 +211,48 @@
         max-width="2xl"
         loading-target="openCreateModal, openEditModal">
         <form wire:submit.prevent="save" class="space-y-5 p-6">
+            {{-- Image Upload Field --}}
+            <div>
+                <label class="block text-sm font-medium text-primary-700 mb-1.5">
+                    {{ __t('field_image', 'inventory') }}
+                </label>
+                <div class="flex items-center gap-4">
+                    <div class="relative h-16 w-16 shrink-0 rounded-xl border border-dashed border-primary-300 bg-primary-50/50 flex items-center justify-center overflow-hidden shadow-inner">
+                        @if ($imageFile)
+                            <img src="{{ $imageFile->temporaryUrl() }}" alt="Preview" class="h-full w-full object-cover" />
+                        @elseif ($image)
+                            <img src="{{ str_starts_with($image, 'http') ? $image : asset('storage/' . $image) }}" alt="Current" class="h-full w-full object-cover" />
+                        @else
+                            <svg class="h-7 w-7 text-primary-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                            </svg>
+                        @endif
+                    </div>
+
+                    <div class="flex-1 space-y-1">
+                        <div class="flex items-center gap-2">
+                            <label class="cursor-pointer inline-flex items-center rounded-xl border border-primary-200 bg-white px-3 py-1.5 text-xs font-semibold text-primary-700 shadow-sm hover:bg-primary-50 transition">
+                                <span>{{ ($imageFile || $image) ? __t('change_image', 'inventory') : __t('select_image', 'inventory') }}</span>
+                                <input type="file" wire:model="imageFile" accept="image/png,image/jpeg,image/webp" class="sr-only" />
+                            </label>
+
+                            @if ($imageFile || $image)
+                                <button type="button" wire:click="removeImage" class="rounded-xl px-2.5 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition">
+                                    {{ __t('remove_image', 'inventory') }}
+                                </button>
+                            @endif
+                        </div>
+                        <p class="text-xs text-primary-500">{{ __t('field_image_help', 'inventory') }}</p>
+                        <div wire:loading wire:target="imageFile" class="text-xs font-medium text-accent-600">
+                            {{ __t('uploading_image', 'inventory') }}
+                        </div>
+                    </div>
+                </div>
+                @error('imageFile')
+                    <p class="mt-1.5 text-xs text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <x-input
                     :label="__t('field_sku', 'inventory')"

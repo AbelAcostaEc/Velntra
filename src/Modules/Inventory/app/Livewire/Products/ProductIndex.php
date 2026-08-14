@@ -3,9 +3,12 @@
 namespace Modules\Inventory\Livewire\Products;
 
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Modules\Inventory\Models\Category;
 use Modules\Inventory\Models\Product;
@@ -14,7 +17,7 @@ use Modules\Inventory\Services\ProductService;
 #[Layout('layouts.app')]
 class ProductIndex extends Component
 {
-    use WithPagination;
+    use WithPagination, WithFileUploads;
 
     public string $search = '';
 
@@ -42,7 +45,9 @@ class ProductIndex extends Component
 
     public $minimum_stock = 0;
 
-    public ?string $image = '';
+    public ?string $image = null;
+
+    public $imageFile = null;
 
     public bool $is_active = true;
 
@@ -102,6 +107,7 @@ class ProductIndex extends Component
             'stock' => ['required', 'integer', 'min:0'],
             'minimum_stock' => ['required', 'integer', 'min:0'],
             'image' => ['nullable', 'string', 'max:500'],
+            'imageFile' => ['nullable', 'image', 'max:2048'],
             'is_active' => ['boolean'],
             'selectedCategories' => ['array'],
             'selectedCategories.*' => ['exists:categories,id'],
@@ -126,9 +132,19 @@ class ProductIndex extends Component
             'stock'               => __t('field_stock', 'inventory'),
             'minimum_stock'       => __t('field_minimum_stock', 'inventory'),
             'image'               => __t('field_image', 'inventory'),
+            'imageFile'           => __t('field_image', 'inventory'),
             'is_active'           => __t('field_is_active', 'inventory'),
             'selectedCategories'  => __t('field_categories', 'inventory'),
         ];
+    }
+
+    /**
+     * Remove current selected / uploaded image.
+     */
+    public function removeImage(): void
+    {
+        $this->image = null;
+        $this->imageFile = null;
     }
 
     /**
@@ -146,6 +162,7 @@ class ProductIndex extends Component
             'name',
             'description',
             'image',
+            'imageFile',
             'selectedCategories',
         ]);
         $this->type = 'simple';
@@ -178,7 +195,8 @@ class ProductIndex extends Component
         $this->price = (string) $product->price;
         $this->stock = (int) $product->stock;
         $this->minimum_stock = (int) $product->minimum_stock;
-        $this->image = $product->image ?? '';
+        $this->image = $product->image;
+        $this->imageFile = null;
         $this->is_active = (bool) $product->is_active;
         $this->selectedCategories = $product->categories->pluck('id')->map(fn($id) => (int)$id)->toArray();
 
@@ -208,9 +226,29 @@ class ProductIndex extends Component
         $validated = $this->validate();
         $categoryIds = array_map('intval', $this->selectedCategories);
 
+        // Handle image upload if a new file is uploaded
+        if ($this->imageFile) {
+            $originalName = pathinfo($this->imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $sluggedName = Str::slug($originalName) ?: (Str::slug($this->name) ?: 'product');
+            $extension = strtolower($this->imageFile->getClientOriginalExtension() ?: 'png');
+            $fileName = time() . '_' . rand(1000, 9999) . '_' . $sluggedName . '.' . $extension;
+
+            $imagePath = $this->imageFile->storeAs('products', $fileName, 'public');
+            $validated['image'] = $imagePath;
+        } else {
+            $validated['image'] = $this->image;
+        }
+
+        unset($validated['imageFile']);
+
         if ($this->selectedProductId) {
             $product = $service->find($this->selectedProductId);
             $this->authorize('update', $product);
+
+            // If replacing or removing an old local storage image
+            if ($product->image && $product->image !== $validated['image'] && !str_starts_with($product->image, 'http')) {
+                Storage::disk('public')->delete($product->image);
+            }
 
             $service->update($product, $validated, $categoryIds);
             $message = __t('product_updated', 'inventory');
@@ -239,6 +277,7 @@ class ProductIndex extends Component
             'stock',
             'minimum_stock',
             'image',
+            'imageFile',
             'is_active',
             'selectedCategories',
         ]);

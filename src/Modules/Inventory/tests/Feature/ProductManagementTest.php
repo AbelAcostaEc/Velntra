@@ -3,6 +3,8 @@
 namespace Modules\Inventory\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Modules\Administration\Models\User;
 use Modules\Inventory\Livewire\Products\ProductIndex;
@@ -463,5 +465,59 @@ class ProductManagementTest extends TestCase
             ->assertDontSeeHtml('wire:click="openCreateModal"')
             ->assertDontSeeHtml("wire:click=\"openEditModal({$product->id})\"")
             ->assertDontSeeHtml("wire:click=\"openDeleteModal({$product->id})\"");
+    }
+
+    public function test_product_index_can_upload_image_via_livewire(): void
+    {
+        Storage::fake('public');
+        $this->actingAs($this->adminUser);
+
+        $file = UploadedFile::fake()->image('test-product.jpg', 400, 400);
+
+        Livewire::test(ProductIndex::class)
+            ->call('openCreateModal')
+            ->set('sku', 'PROD-IMG-01')
+            ->set('name', 'Image Product')
+            ->set('cost', '10.00')
+            ->set('price', '20.00')
+            ->set('stock', 50)
+            ->set('minimum_stock', 5)
+            ->set('imageFile', $file)
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $product = Product::where('sku', 'PROD-IMG-01')->first();
+        $this->assertNotNull($product);
+        $this->assertNotNull($product->image);
+        Storage::disk('public')->assertExists($product->image);
+        $this->assertStringContainsString('storage/products/', $product->image_url);
+    }
+
+    public function test_product_index_can_remove_image_via_livewire(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $product = Product::create([
+            'sku'           => 'PROD-REMOVE-IMG',
+            'name'          => 'Product With Image',
+            'type'          => 'simple',
+            'cost'          => 1.00,
+            'price'         => 2.00,
+            'stock'         => 10,
+            'minimum_stock' => 1,
+            'image'         => 'products/dummy.jpg',
+            'is_active'     => true,
+        ]);
+
+        Livewire::test(ProductIndex::class)
+            ->call('openEditModal', $product->id)
+            ->assertSet('image', 'products/dummy.jpg')
+            ->call('removeImage')
+            ->assertSet('image', null)
+            ->assertSet('imageFile', null)
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertNull($product->fresh()->image);
     }
 }

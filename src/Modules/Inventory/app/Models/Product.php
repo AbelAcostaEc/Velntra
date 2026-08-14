@@ -60,6 +60,22 @@ class Product extends Model
     }
 
     /**
+     * Get the accessible public URL for the product image.
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        if (! $this->image) {
+            return null;
+        }
+
+        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
+            return $this->image;
+        }
+
+        return asset('storage/' . $this->image);
+    }
+
+    /**
      * Categories associated with the product.
      */
     public function categories(): BelongsToMany
