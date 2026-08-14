@@ -246,4 +246,19 @@ class RoleManagementTest extends TestCase
             ->assertDontSeeHtml('wire:click="openEditModal')
             ->assertDontSeeHtml('wire:click="openDeleteModal');
     }
+
+    public function test_role_index_supports_dynamic_per_page(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        for ($i = 1; $i <= 15; $i++) {
+            Role::create(['name' => "Custom Role {$i}", 'guard_name' => 'web']);
+        }
+
+        Livewire::test(RoleIndex::class)
+            ->set('perPage', 5)
+            ->assertViewHas('roles', fn($roles) => $roles->perPage() === 5)
+            ->set('perPage', 20)
+            ->assertViewHas('roles', fn($roles) => $roles->perPage() === 20);
+    }
 }

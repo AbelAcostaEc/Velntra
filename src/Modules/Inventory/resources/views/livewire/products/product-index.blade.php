@@ -23,7 +23,7 @@
         </x-slot:summary>
 
         <x-slot:content>
-            <x-table loading-target="search, categoryFilter, statusFilter">
+            <x-table loading-target="search, categoryFilter, statusFilter, perPage">
                 <x-slot:toolbar>
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between w-full">
                         <x-table-search :placeholder="__t('search_products_placeholder', 'inventory')" wire:model.live.debounce.300ms="search" class="w-full sm:max-w-xs" />
@@ -47,6 +47,8 @@
                                 <option value="active">{{ __t('active', 'inventory') }}</option>
                                 <option value="inactive">{{ __t('inactive', 'inventory') }}</option>
                             </select>
+
+                            <x-per-page-select wire:model.live="perPage" />
                         </div>
                     </div>
                 </x-slot:toolbar>

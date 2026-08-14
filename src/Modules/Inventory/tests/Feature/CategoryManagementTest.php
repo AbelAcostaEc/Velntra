@@ -331,4 +331,23 @@ class CategoryManagementTest extends TestCase
             ->assertDontSeeHtml("wire:click=\"openEditModal({$category->id})\"")
             ->assertDontSeeHtml("wire:click=\"openDeleteModal({$category->id})\"");
     }
+
+    public function test_category_index_supports_dynamic_per_page(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        for ($i = 1; $i <= 15; $i++) {
+            Category::create([
+                'code'      => "CAT-PAGE-{$i}",
+                'name'      => "Category {$i}",
+                'is_active' => true,
+            ]);
+        }
+
+        Livewire::test(CategoryIndex::class)
+            ->set('perPage', 5)
+            ->assertViewHas('categories', fn($cats) => $cats->perPage() === 5)
+            ->set('perPage', 30)
+            ->assertViewHas('categories', fn($cats) => $cats->perPage() === 30);
+    }
 }

@@ -27,6 +27,19 @@ class RoleIndex extends Component
     public string $search = '';
 
     /**
+     * Cantidad de registros por página en la tabla.
+     */
+    public int $perPage = 10;
+
+    /**
+     * Reiniciar la paginación al cambiar la cantidad de items por página.
+     */
+    public function updatingPerPage(): void
+    {
+        $this->resetPage();
+    }
+
+    /**
      * ID del rol seleccionado para edición o eliminación (null en creación).
      */
     public ?int $selectedRoleId = null;
@@ -243,7 +256,7 @@ class RoleIndex extends Component
             ->withCount(['permissions', 'users'])
             ->when($this->search, fn($q) => $q->where('name', 'like', "%{$this->search}%"))
             ->latest()
-            ->paginate(10);
+            ->paginate($this->perPage);
 
         // Agrupar permisos por prefijo de módulo (ej. users, roles, categories)
         $allPermissions = Permission::orderBy('name')->get();

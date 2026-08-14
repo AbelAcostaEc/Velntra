@@ -520,4 +520,28 @@ class ProductManagementTest extends TestCase
 
         $this->assertNull($product->fresh()->image);
     }
+
+    public function test_product_index_supports_dynamic_per_page(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        for ($i = 1; $i <= 15; $i++) {
+            Product::create([
+                'sku'           => "PROD-PAGE-{$i}",
+                'name'          => "Product {$i}",
+                'type'          => 'simple',
+                'cost'          => 1.00,
+                'price'         => 2.00,
+                'stock'         => 10,
+                'minimum_stock' => 1,
+                'is_active'     => true,
+            ]);
+        }
+
+        Livewire::test(ProductIndex::class)
+            ->set('perPage', 5)
+            ->assertViewHas('products', fn($products) => $products->perPage() === 5)
+            ->set('perPage', 20)
+            ->assertViewHas('products', fn($products) => $products->perPage() === 20);
+    }
 }

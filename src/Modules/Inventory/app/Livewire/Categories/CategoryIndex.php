@@ -19,6 +19,8 @@ class CategoryIndex extends Component
 
     public string $statusFilter = '';
 
+    public int $perPage = 10;
+
     public ?int $selectedCategoryId = null;
 
     public string $code = '';
@@ -43,6 +45,14 @@ class CategoryIndex extends Component
      * Reset pagination when status filter updates.
      */
     public function updatingStatusFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    /**
+     * Reset pagination when items per page updates.
+     */
+    public function updatingPerPage(): void
     {
         $this->resetPage();
     }
@@ -218,7 +228,7 @@ class CategoryIndex extends Component
             $query->where('is_active', false);
         }
 
-        $categories = $query->latest('id')->paginate(10);
+        $categories = $query->latest('id')->paginate($this->perPage);
 
         $totalCategories = Category::count();
         $activeCategories = Category::where('is_active', true)->count();

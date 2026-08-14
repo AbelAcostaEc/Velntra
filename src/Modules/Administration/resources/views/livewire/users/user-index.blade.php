@@ -23,9 +23,12 @@
         </x-slot:summary>
 
         <x-slot:content>
-            <x-table loading-target="search">
+            <x-table loading-target="search, perPage">
                 <x-slot:toolbar>
-                    <x-table-search :placeholder="__t('search_placeholder', 'administration')" wire:model.live.debounce.300ms="search" />
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between w-full">
+                        <x-table-search :placeholder="__t('search_placeholder', 'administration')" wire:model.live.debounce.300ms="search" class="w-full sm:max-w-xs" />
+                        <x-per-page-select wire:model.live="perPage" />
+                    </div>
                 </x-slot:toolbar>
 
                 <x-slot:head>

@@ -25,6 +25,8 @@ class ProductIndex extends Component
 
     public string $statusFilter = '';
 
+    public int $perPage = 10;
+
     public ?int $selectedProductId = null;
 
     public string $sku = '';
@@ -78,6 +80,14 @@ class ProductIndex extends Component
      * Reset pagination when status filter updates.
      */
     public function updatingStatusFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    /**
+     * Reset pagination when items per page updates.
+     */
+    public function updatingPerPage(): void
     {
         $this->resetPage();
     }
@@ -352,7 +362,7 @@ class ProductIndex extends Component
             $query->where('is_active', false);
         }
 
-        $products = $query->latest('id')->paginate(10);
+        $products = $query->latest('id')->paginate($this->perPage);
 
         $totalProducts = Product::count();
         $activeProducts = Product::where('is_active', true)->count();

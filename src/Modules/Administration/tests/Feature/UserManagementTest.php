@@ -230,4 +230,17 @@ class UserManagementTest extends TestCase
             ->assertDontSeeHtml('wire:click="openEditModal')
             ->assertDontSeeHtml('wire:click="openDeleteModal');
     }
+
+    public function test_user_index_supports_dynamic_per_page(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        User::factory()->count(15)->create();
+
+        Livewire::test(UserIndex::class)
+            ->set('perPage', 5)
+            ->assertViewHas('users', fn($users) => $users->perPage() === 5)
+            ->set('perPage', 20)
+            ->assertViewHas('users', fn($users) => $users->perPage() === 20);
+    }
 }
