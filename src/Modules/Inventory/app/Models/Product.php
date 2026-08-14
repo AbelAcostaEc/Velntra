@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Administration\Models\User;
 
-class Category extends Model
+class Product extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -19,7 +19,7 @@ class Category extends Model
      *
      * @var string
      */
-    protected $table = 'categories';
+    protected $table = 'products';
 
     /**
      * The attributes that are mass assignable.
@@ -27,9 +27,16 @@ class Category extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'code',
+        'sku',
+        'barcode',
+        'type',
         'name',
         'description',
+        'cost',
+        'price',
+        'stock',
+        'minimum_stock',
+        'image',
         'is_active',
         'created_by',
         'updated_by',
@@ -44,21 +51,25 @@ class Category extends Model
     protected function casts(): array
     {
         return [
-            'is_active' => 'boolean',
+            'cost'          => 'decimal:2',
+            'price'         => 'decimal:2',
+            'stock'         => 'integer',
+            'minimum_stock' => 'integer',
+            'is_active'     => 'boolean',
         ];
     }
 
     /**
-     * Products belonging to the category.
+     * Categories associated with the product.
      */
-    public function products(): BelongsToMany
+    public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'category_product')
+        return $this->belongsToMany(Category::class, 'category_product')
             ->withTimestamps();
     }
 
     /**
-     * User who created the category.
+     * User who created the product.
      */
     public function creator(): BelongsTo
     {
@@ -66,7 +77,7 @@ class Category extends Model
     }
 
     /**
-     * User who last updated the category.
+     * User who last updated the product.
      */
     public function updater(): BelongsTo
     {
@@ -74,7 +85,7 @@ class Category extends Model
     }
 
     /**
-     * User who deleted the category.
+     * User who deleted the product.
      */
     public function destroyer(): BelongsTo
     {
@@ -82,7 +93,7 @@ class Category extends Model
     }
 
     /**
-     * Scope a query to only include active categories.
+     * Scope a query to only include active products.
      */
     public function scopeActive(Builder $query): Builder
     {
@@ -90,7 +101,15 @@ class Category extends Model
     }
 
     /**
-     * Scope a query to search categories by name or code.
+     * Scope a query to only include low stock products.
+     */
+    public function scopeLowStock(Builder $query): Builder
+    {
+        return $query->whereColumn('stock', '<=', 'minimum_stock');
+    }
+
+    /**
+     * Scope a query to search products by name, SKU, or barcode.
      */
     public function scopeSearch(Builder $query, ?string $term): Builder
     {
@@ -102,7 +121,8 @@ class Category extends Model
 
         return $query->where(function (Builder $q) use ($term) {
             $q->where('name', 'like', "%{$term}%")
-              ->orWhere('code', 'like', "%{$term}%")
+              ->orWhere('sku', 'like', "%{$term}%")
+              ->orWhere('barcode', 'like', "%{$term}%")
               ->orWhere('description', 'like', "%{$term}%");
         });
     }

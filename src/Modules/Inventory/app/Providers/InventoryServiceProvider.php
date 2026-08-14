@@ -4,7 +4,9 @@ namespace Modules\Inventory\Providers;
 
 use Illuminate\Support\Facades\Gate;
 use Modules\Inventory\Models\Category;
+use Modules\Inventory\Models\Product;
 use Modules\Inventory\Policies\CategoryPolicy;
+use Modules\Inventory\Policies\ProductPolicy;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
 class InventoryServiceProvider extends ModuleServiceProvider
@@ -36,6 +38,7 @@ class InventoryServiceProvider extends ModuleServiceProvider
      */
     protected array $policies = [
         Category::class => CategoryPolicy::class,
+        Product::class  => ProductPolicy::class,
     ];
 
     /**
