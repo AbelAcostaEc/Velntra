@@ -4,6 +4,7 @@ namespace Modules\Customers\Livewire\Customers;
 
 // Framework & Livewire
 use Illuminate\Contracts\View\View;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -106,12 +107,19 @@ class CustomerIndex extends Component
     protected function rules(): array
     {
         return [
-            'document'  => 'nullable|string|max:30',
-            'name'      => 'required|string|max:255',
-            'phone'     => 'nullable|string|max:30',
-            'email'     => 'nullable|email|max:255',
-            'address'   => 'nullable|string|max:500',
-            'is_active' => 'boolean',
+            'document'  => [
+                'nullable',
+                'string',
+                'max:30',
+                Rule::unique('customers', 'document')
+                    ->ignore($this->selectedCustomerId)
+                    ->whereNull('deleted_at'),
+            ],
+            'name'      => ['required', 'string', 'max:255'],
+            'phone'     => ['nullable', 'string', 'max:30'],
+            'email'     => ['nullable', 'email', 'max:255'],
+            'address'   => ['nullable', 'string', 'max:500'],
+            'is_active' => ['boolean'],
         ];
     }
 

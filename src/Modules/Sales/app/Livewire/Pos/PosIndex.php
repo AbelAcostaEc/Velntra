@@ -5,6 +5,7 @@ namespace Modules\Sales\Livewire\Pos;
 // Framework & Livewire
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -101,9 +102,19 @@ class PosIndex extends Component
      * Campos para creación rápida de cliente desde el POS.
      */
     public string $newCustomerName = '';
-    public string $newCustomerDocument = '';
-    public string $newCustomerPhone = '';
-    public string $newCustomerEmail = '';
+    public ?string $newCustomerDocument = '';
+    public ?string $newCustomerPhone = '';
+    public ?string $newCustomerEmail = '';
+
+    /**
+     * Campos para edición de cliente directamente desde el POS.
+     */
+    public ?int $editingCustomerId = null;
+    public string $editCustomerName = '';
+    public ?string $editCustomerDocument = '';
+    public ?string $editCustomerPhone = '';
+    public ?string $editCustomerEmail = '';
+    public ?string $editCustomerAddress = '';
 
     /**
      * Búsqueda y paginación para el historial de ventas.
@@ -338,10 +349,15 @@ class PosIndex extends Component
     public function createQuickCustomer(CustomerService $customerService): void
     {
         $this->validate([
-            'newCustomerName'     => 'required|string|max:255',
-            'newCustomerDocument' => 'nullable|string|max:30',
-            'newCustomerPhone'    => 'nullable|string|max:30',
-            'newCustomerEmail'    => 'nullable|email|max:255',
+            'newCustomerName'     => ['required', 'string', 'max:255'],
+            'newCustomerDocument' => [
+                'nullable',
+                'string',
+                'max:30',
+                Rule::unique('customers', 'document')->whereNull('deleted_at'),
+            ],
+            'newCustomerPhone'    => ['nullable', 'string', 'max:30'],
+            'newCustomerEmail'    => ['nullable', 'email', 'max:255'],
         ]);
 
         $customer = $customerService->create([
@@ -359,6 +375,69 @@ class PosIndex extends Component
         $this->dispatch('toast', [
             'type'    => 'success',
             'message' => 'Cliente creado y seleccionado.',
+        ]);
+    }
+
+    /**
+     * Abrir modal para editar el cliente seleccionado directamente desde el POS.
+     */
+    public function openEditCustomerModal(): void
+    {
+        if (!$this->selectedCustomerId) {
+            return;
+        }
+
+        $customer = Customer::findOrFail($this->selectedCustomerId);
+
+        $this->editingCustomerId = $customer->id;
+        $this->editCustomerName = $customer->name;
+        $this->editCustomerDocument = $customer->document ?? '';
+        $this->editCustomerPhone = $customer->phone ?? '';
+        $this->editCustomerEmail = $customer->email ?? '';
+        $this->editCustomerAddress = $customer->address ?? '';
+
+        $this->resetValidation();
+        $this->dispatch('open-modal', 'edit-customer-modal');
+    }
+
+    /**
+     * Guardar los cambios del cliente editado desde el POS.
+     */
+    public function updateCustomer(CustomerService $customerService): void
+    {
+        if (!$this->editingCustomerId) {
+            return;
+        }
+
+        $this->validate([
+            'editCustomerName'     => ['required', 'string', 'max:255'],
+            'editCustomerDocument' => [
+                'nullable',
+                'string',
+                'max:30',
+                Rule::unique('customers', 'document')
+                    ->ignore($this->editingCustomerId)
+                    ->whereNull('deleted_at'),
+            ],
+            'editCustomerPhone'    => ['nullable', 'string', 'max:30'],
+            'editCustomerEmail'    => ['nullable', 'email', 'max:255'],
+            'editCustomerAddress'  => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $customer = $customerService->find($this->editingCustomerId);
+        $customerService->update($customer, [
+            'name'     => $this->editCustomerName,
+            'document' => $this->editCustomerDocument,
+            'phone'    => $this->editCustomerPhone,
+            'email'    => $this->editCustomerEmail,
+            'address'  => $this->editCustomerAddress,
+        ]);
+
+        $this->dispatch('close-modal', 'edit-customer-modal');
+
+        $this->dispatch('toast', [
+            'type'    => 'success',
+            'message' => 'Cliente actualizado exitosamente.',
         ]);
     }
 

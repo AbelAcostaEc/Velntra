@@ -181,6 +181,18 @@
                         </div>
 
                         <div class="flex items-center gap-1.5 shrink-0">
+                            @if ($selectedCustomer && !$selectedCustomer->isConsumidorFinal())
+                                <button
+                                    type="button"
+                                    wire:click="openEditCustomerModal"
+                                    class="flex items-center gap-1 rounded-lg border border-primary-200 bg-white px-2 py-1 text-xs font-semibold text-primary-700 shadow-2xs hover:bg-primary-50 transition"
+                                    title="Editar datos del cliente">
+                                    <svg class="h-3 w-3 text-primary-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                    </svg>
+                                    Editar
+                                </button>
+                            @endif
                             <button
                                 type="button"
                                 x-on:click="$dispatch('open-modal', 'select-customer-modal')"
@@ -770,7 +782,29 @@
         </form>
     </x-modal>
 
-    {{-- MODAL 6: ANULAR VENTA --}}
+    {{-- MODAL 6: EDITAR CLIENTE SELECCIONADO --}}
+    <x-modal name="edit-customer-modal" title="Editar Información del Cliente" description="Actualiza los datos del cliente seleccionado directamente desde el punto de venta.">
+        <form wire:submit.prevent="updateCustomer" class="p-6 space-y-4">
+            <x-input label="Nombre Completo" name="editCustomerName" placeholder="Ej. Carlos Mendoza" wire:model="editCustomerName" required />
+            <x-input label="Cédula / RUC" name="editCustomerDocument" placeholder="Ej. 1712345678" wire:model="editCustomerDocument" />
+            <div class="grid grid-cols-2 gap-3">
+                <x-input label="Teléfono" name="editCustomerPhone" placeholder="0987654321" wire:model="editCustomerPhone" />
+                <x-input label="Correo Electrónico" name="editCustomerEmail" type="email" placeholder="carlos@ejemplo.com" wire:model="editCustomerEmail" />
+            </div>
+            <x-input label="Dirección" name="editCustomerAddress" placeholder="Ej. Av. 10 de Agosto y Colón" wire:model="editCustomerAddress" />
+
+            <div class="flex justify-end gap-2 pt-3 border-t border-primary-200">
+                <x-button type="button" variant="secondary" x-on:click="$dispatch('close-modal', 'edit-customer-modal')">
+                    {{ __t('cancel', 'sales') }}
+                </x-button>
+                <x-button type="submit">
+                    Guardar Cambios
+                </x-button>
+            </div>
+        </form>
+    </x-modal>
+
+    {{-- MODAL 7: ANULAR VENTA --}}
     <x-modal name="cancel-sale-modal" :title="__t('cancel_sale', 'sales')" :description="__t('cancel_sale_confirm', 'sales')">
         <form wire:submit.prevent="cancelSale" class="p-6 space-y-4">
             <x-input

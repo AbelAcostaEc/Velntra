@@ -37,9 +37,18 @@ class CustomerService
      */
     public function create(array $data): Customer
     {
-        return DB::transaction(function () use ($data) {
+        $document = !empty($data['document']) ? trim($data['document']) : null;
+
+        if ($document) {
+            $existing = Customer::where('document', $document)->first();
+            if ($existing) {
+                throw new InvalidArgumentException("Ya existe un cliente activo registrado con el documento {$document}.");
+            }
+        }
+
+        return DB::transaction(function () use ($data, $document) {
             return Customer::create([
-                'document'  => !empty($data['document']) ? trim($data['document']) : null,
+                'document'  => $document,
                 'name'      => trim($data['name']),
                 'phone'     => !empty($data['phone']) ? trim($data['phone']) : null,
                 'email'     => !empty($data['email']) ? trim($data['email']) : null,
@@ -65,9 +74,20 @@ class CustomerService
      */
     public function update(Customer $customer, array $data): Customer
     {
-        return DB::transaction(function () use ($customer, $data) {
+        $document = !empty($data['document']) ? trim($data['document']) : null;
+
+        if ($document) {
+            $existing = Customer::where('document', $document)
+                ->where('id', '!=', $customer->id)
+                ->first();
+            if ($existing) {
+                throw new InvalidArgumentException("Ya existe un cliente activo registrado con el documento {$document}.");
+            }
+        }
+
+        return DB::transaction(function () use ($customer, $data, $document) {
             $customer->update([
-                'document'  => !empty($data['document']) ? trim($data['document']) : null,
+                'document'  => $document,
                 'name'      => trim($data['name']),
                 'phone'     => !empty($data['phone']) ? trim($data['phone']) : null,
                 'email'     => !empty($data['email']) ? trim($data['email']) : null,

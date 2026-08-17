@@ -69,11 +69,10 @@ class SaleManagementTest extends TestCase
             'password' => bcrypt('password123'),
         ]);
 
-        $this->customer = Customer::create([
-            'name'      => 'Consumidor Final',
-            'document'  => '9999999999999',
-            'is_active' => true,
-        ]);
+        $this->customer = Customer::firstOrCreate(
+            ['document' => '9999999999999'],
+            ['name' => 'Consumidor Final', 'is_active' => true]
+        );
 
         $this->productA = Product::create([
             'sku'           => 'PROD-001',
@@ -317,5 +316,47 @@ class SaleManagementTest extends TestCase
 
         $this->assertEquals('cancelled', $sale->fresh()->status);
         $this->assertEquals(20, $this->productA->fresh()->stock); // Stock restored
+    }
+
+    public function test_pos_index_can_edit_customer_directly_from_pos(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $customer = Customer::create([
+            'name'     => 'Carlos Original',
+            'document' => '1718192021',
+            'email'    => 'carlos.orig@velntra.test',
+            'phone'    => '0991112223',
+        ]);
+
+        Livewire::test(PosIndex::class)
+            ->set('selectedCustomerId', $customer->id)
+            ->call('openEditCustomerModal')
+            ->assertSet('editCustomerName', 'Carlos Original')
+            ->assertSet('editCustomerEmail', 'carlos.orig@velntra.test')
+            ->set('editCustomerEmail', 'carlos.updated@velntra.test')
+            ->set('editCustomerPhone', '0993334445')
+            ->call('updateCustomer')
+            ->assertDispatched('close-modal', 'edit-customer-modal')
+            ->assertDispatched('toast');
+
+        $this->assertEquals('carlos.updated@velntra.test', $customer->fresh()->email);
+        $this->assertEquals('0993334445', $customer->fresh()->phone);
+    }
+
+    public function test_pos_index_quick_customer_validates_unique_document(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        Customer::create([
+            'name'     => 'Already Registered Client',
+            'document' => '1722334455',
+        ]);
+
+        Livewire::test(PosIndex::class)
+            ->set('newCustomerName', 'New Client Attempt')
+            ->set('newCustomerDocument', '1722334455')
+            ->call('createQuickCustomer')
+            ->assertHasErrors(['newCustomerDocument']);
     }
 }

@@ -111,11 +111,10 @@ class CustomerManagementTest extends TestCase
     {
         $service = app(CustomerService::class);
 
-        $finalConsumer = Customer::create([
-            'document'  => '9999999999999',
-            'name'      => 'Consumidor Final',
-            'is_active' => true,
-        ]);
+        $finalConsumer = Customer::firstOrCreate(
+            ['document' => '9999999999999'],
+            ['name' => 'Consumidor Final', 'is_active' => true]
+        );
 
         $this->expectException(InvalidArgumentException::class);
         $service->delete($finalConsumer);
@@ -279,5 +278,48 @@ class CustomerManagementTest extends TestCase
             ->assertViewHas('customers', fn($c) => $c->total() === 1)
             ->set('search', 'Nonexistent Customer')
             ->assertViewHas('customers', fn($c) => $c->total() === 0);
+    }
+
+    public function test_customer_index_validates_unique_document(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        Customer::create([
+            'document'  => '1799887766001',
+            'name'      => 'Existing Customer With RUC',
+            'is_active' => true,
+        ]);
+
+        Livewire::test(CustomerIndex::class)
+            ->call('openCreateModal')
+            ->set('name', 'Duplicate RUC Customer')
+            ->set('document', '1799887766001')
+            ->call('save')
+            ->assertHasErrors(['document']);
+    }
+
+    public function test_customer_can_be_created_with_document_of_deleted_customer(): void
+    {
+        $service = app(CustomerService::class);
+
+        $customerA = Customer::create([
+            'document'  => '2345',
+            'name'      => 'Customer to Delete',
+            'is_active' => true,
+        ]);
+
+        $service->delete($customerA);
+        $this->assertSoftDeleted('customers', ['id' => $customerA->id]);
+
+        $customerB = $service->create([
+            'document'  => '2345',
+            'name'      => 'New Customer with Released Document',
+            'is_active' => true,
+        ]);
+
+        $this->assertDatabaseHas('customers', [
+            'id'       => $customerB->id,
+            'document' => '2345',
+        ]);
     }
 }
