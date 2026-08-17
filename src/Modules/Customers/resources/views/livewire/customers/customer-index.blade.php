@@ -96,6 +96,15 @@
                         </td>
                         <td class="px-4 py-4 text-right">
                             <div class="flex items-center justify-end gap-2">
+                                <a
+                                    href="{{ route('customers.history', $customer->id) }}"
+                                    class="inline-flex items-center gap-1.5 rounded-xl border border-primary-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-primary-700 shadow-2xs transition hover:bg-primary-50 hover:text-brand-600 hover:border-brand-300">
+                                    <svg class="h-3.5 w-3.5 text-primary-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
+                                    {{ __t('purchases_history', 'customers') }}
+                                </a>
+
                                 @can('update', $customer)
                                     <x-button
                                         variant="secondary"
@@ -145,6 +154,15 @@
                             </x-slot:status>
 
                             <x-slot:actions>
+                                <a
+                                    href="{{ route('customers.history', $customer->id) }}"
+                                    class="inline-flex items-center gap-1.5 rounded-xl border border-primary-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-primary-700 shadow-2xs transition hover:bg-primary-50 hover:text-brand-600">
+                                    <svg class="h-3.5 w-3.5 text-primary-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
+                                    {{ __t('purchases_history', 'customers') }}
+                                </a>
+
                                 @can('update', $customer)
                                     <x-button
                                         variant="secondary"

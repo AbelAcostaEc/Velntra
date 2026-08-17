@@ -6,8 +6,10 @@ namespace Modules\Customers\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Customers\Database\Factories\CustomerFactory;
+use Modules\Sales\Models\Sale;
 
 class Customer extends Model
 {
@@ -87,5 +89,15 @@ class Customer extends Model
     public function isConsumidorFinal(): bool
     {
         return $this->document === '9999999999999' || $this->name === 'Consumidor Final';
+    }
+
+    /**
+     * Ventas asociadas a este cliente.
+     *
+     * @return HasMany<Sale>
+     */
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class, 'customer_id');
     }
 }

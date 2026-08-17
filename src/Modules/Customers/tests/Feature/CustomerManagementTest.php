@@ -8,8 +8,10 @@ use Livewire\Livewire;
 use Modules\Administration\Models\User;
 use Modules\Customers\Database\Seeders\CustomerSeeder;
 use Modules\Customers\Livewire\Customers\CustomerIndex;
+use Modules\Customers\Livewire\Customers\CustomerPurchaseHistory;
 use Modules\Customers\Models\Customer;
 use Modules\Customers\Services\CustomerService;
+use Modules\Sales\Models\Sale;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -321,5 +323,120 @@ class CustomerManagementTest extends TestCase
             'id'       => $customerB->id,
             'document' => '2345',
         ]);
+    }
+
+    public function test_customer_purchase_history_authorizes_and_renders_with_sales_metrics(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $customer = Customer::create([
+            'document'  => '1712349999',
+            'name'      => 'History Test Customer',
+            'is_active' => true,
+        ]);
+
+        // Create 2 completed sales ($50 and $150) and 1 cancelled sale ($100)
+        Sale::create([
+            'number'         => 'VTA-HIST-001',
+            'customer_id'    => $customer->id,
+            'user_id'        => $this->adminUser->id,
+            'subtotal'       => 43.48,
+            'discount'       => 0.00,
+            'tax'            => 6.52,
+            'tax_percentage' => 15.00,
+            'total'          => 50.00,
+            'payment_method' => 'cash',
+            'status'         => 'completed',
+        ]);
+
+        Sale::create([
+            'number'         => 'VTA-HIST-002',
+            'customer_id'    => $customer->id,
+            'user_id'        => $this->adminUser->id,
+            'subtotal'       => 130.43,
+            'discount'       => 0.00,
+            'tax'            => 19.57,
+            'tax_percentage' => 15.00,
+            'total'          => 150.00,
+            'payment_method' => 'card',
+            'status'         => 'completed',
+        ]);
+
+        Sale::create([
+            'number'         => 'VTA-HIST-003',
+            'customer_id'    => $customer->id,
+            'user_id'        => $this->adminUser->id,
+            'subtotal'       => 86.96,
+            'discount'       => 0.00,
+            'tax'            => 13.04,
+            'tax_percentage' => 15.00,
+            'total'          => 100.00,
+            'payment_method' => 'cash',
+            'status'         => 'cancelled',
+        ]);
+
+        Livewire::test(CustomerPurchaseHistory::class, ['customer' => $customer])
+            ->assertStatus(200)
+            ->assertSee('History Test Customer')
+            ->assertSee('VTA-HIST-001')
+            ->assertSee('VTA-HIST-002')
+            ->assertSee('VTA-HIST-003')
+            ->assertViewHas('stats', function ($stats) {
+                // Completed total: 50 + 150 = 200, count: 2, avg ticket: 100
+                return $stats['total_spent'] == 200.00
+                    && $stats['total_purchases'] === 2
+                    && $stats['average_ticket'] == 100.00;
+            });
+    }
+
+    public function test_customer_purchase_history_filters_by_search_and_status(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $customer = Customer::create([
+            'document'  => '1798765432',
+            'name'      => 'Filter Test Customer',
+            'is_active' => true,
+        ]);
+
+        Sale::create([
+            'number'         => 'VTA-FILTER-001',
+            'customer_id'    => $customer->id,
+            'user_id'        => $this->adminUser->id,
+            'subtotal'       => 20.00,
+            'total'          => 23.00,
+            'status'         => 'completed',
+        ]);
+
+        Sale::create([
+            'number'         => 'VTA-FILTER-002',
+            'customer_id'    => $customer->id,
+            'user_id'        => $this->adminUser->id,
+            'subtotal'       => 30.00,
+            'total'          => 34.50,
+            'status'         => 'pending',
+        ]);
+
+        Livewire::test(CustomerPurchaseHistory::class, ['customer' => $customer])
+            ->set('search', 'FILTER-001')
+            ->assertSee('VTA-FILTER-001')
+            ->assertDontSee('VTA-FILTER-002')
+            ->set('search', '')
+            ->set('statusFilter', 'pending')
+            ->assertSee('VTA-FILTER-002')
+            ->assertDontSee('VTA-FILTER-001');
+    }
+
+    public function test_customer_purchase_history_denies_unauthorized_user(): void
+    {
+        $this->actingAs($this->unauthorizedUser);
+
+        $customer = Customer::create([
+            'name'      => 'Protected Customer',
+            'is_active' => true,
+        ]);
+
+        Livewire::test(CustomerPurchaseHistory::class, ['customer' => $customer])
+            ->assertForbidden();
     }
 }

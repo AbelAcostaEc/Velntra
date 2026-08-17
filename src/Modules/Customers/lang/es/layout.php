@@ -60,6 +60,28 @@ return [
     'save'                               => 'Guardar',
     'saving'                             => 'Guardando...',
 
+    // Purchase History Page
+    'purchases_history'                  => 'Historial de Compras',
+    'customer_history_title'             => 'Historial de Compras del Cliente',
+    'customer_history_description'       => 'Consulta el registro detallado de todas las transacciones, compras y comprobantes de este cliente.',
+    'back_to_customers'                  => 'Volver a Clientes',
+    'total_spent'                        => 'Total Comprado',
+    'total_purchases'                    => 'Compras Realizadas',
+    'average_ticket'                     => 'Ticket Promedio',
+    'last_purchase'                      => 'Última Compra',
+    'no_purchases_yet'                   => 'Sin compras aún',
+    'completed_sales_only'               => 'Ventas completadas',
+    'search_sales_placeholder'           => 'Buscar por número de comprobante...',
+    'col_sale_number'                    => 'N° Comprobante',
+    'col_sale_date'                      => 'Fecha y Hora',
+    'col_sale_items'                     => 'Ítems',
+    'col_sale_payment'                   => 'Método de Pago',
+    'col_sale_total'                     => 'Total',
+    'col_sale_status'                    => 'Estado',
+    'view_receipt'                       => 'Ver Comprobante',
+    'no_sales_found'                     => 'No se encontraron compras',
+    'no_sales_found_description'         => 'Este cliente no cuenta con compras registradas o no coinciden con los filtros aplicados.',
+
     // Delete modal
     'delete_customer_title'              => 'Eliminar Cliente',
     'delete_customer_description'        => '¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer.',
