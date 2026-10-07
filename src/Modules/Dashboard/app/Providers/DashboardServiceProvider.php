@@ -3,7 +3,6 @@
 namespace Modules\Dashboard\Providers;
 
 use Nwidart\Modules\Support\ModuleServiceProvider;
-use Illuminate\Console\Scheduling\Schedule;
 
 class DashboardServiceProvider extends ModuleServiceProvider
 {
@@ -35,9 +34,25 @@ class DashboardServiceProvider extends ModuleServiceProvider
     ];
 
     /**
+     * Register translations for the module.
+     */
+    protected function registerTranslations(): void
+    {
+        $langPath = resource_path('lang/modules/'.$this->nameLower);
+
+        if (is_dir($langPath)) {
+            $this->loadTranslationsFrom($langPath, $this->nameLower);
+            $this->loadJsonTranslationsFrom($langPath);
+        } else {
+            $this->loadTranslationsFrom(module_path($this->name, 'lang'), $this->nameLower);
+            $this->loadJsonTranslationsFrom(module_path($this->name, 'lang'));
+        }
+    }
+
+    /**
      * Define module schedules.
-     * 
-     * @param $schedule
+     *
+     * @param  $schedule
      */
     // protected function configureSchedules(Schedule $schedule): void
     // {

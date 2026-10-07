@@ -5,6 +5,7 @@ namespace Tests\Feature\Auth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Volt\Volt;
 use Modules\Administration\Models\User;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -57,6 +58,9 @@ class AuthenticationTest extends TestCase
     public function test_dashboard_can_be_rendered(): void
     {
         $user = User::factory()->create();
+        $permission = Permission::findOrCreate('dashboard.view');
+
+        $user->givePermissionTo($permission);
 
         $this->actingAs($user);
 
@@ -64,7 +68,7 @@ class AuthenticationTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('Dashboard');
+            ->assertSee(__('dashboard::layout.title'));
     }
 
     public function test_users_can_logout(): void

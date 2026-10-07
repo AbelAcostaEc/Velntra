@@ -10,10 +10,6 @@ Route::get('/', function () {
     return redirect()->route(Auth::check() ? 'dashboard' : 'login');
 });
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
-
 Route::view('dashboard/styleguide', 'dashboard.styleguide')
     ->middleware(['auth', 'verified'])
     ->name('dashboard.styleguide');
