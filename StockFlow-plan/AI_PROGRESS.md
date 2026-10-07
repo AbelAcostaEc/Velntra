@@ -2,11 +2,13 @@
 
 ## Estado actual
 
-Sprint actual: cierre técnico del Sprint 05 - Ventas.
+Sprint actual: Sprint 06 - Dashboard.
 
 Estado general: núcleo operativo del MVP implementado. Los Sprints 01 a 04 están
 completos y validados mediante pruebas automatizadas y build en Docker. El
-Sprint 08 fue adelantado y está casi completo.
+Sprint 05 quedó validado con pruebas automatizadas reforzadas y con la prueba
+manual integral previamente realizada. El Sprint 08 fue adelantado y está casi
+completo.
 
 Última actualización: 2026-10-07.
 
@@ -18,7 +20,7 @@ Sprint 08 fue adelantado y está casi completo.
 | 02 - Administración | 100 % | Usuarios, roles, permisos, perfil, servicios, policies y pruebas validadas. El cierre del registro público queda como decisión previa a producción. |
 | 03 - Inventario | 100 % | Categorías y productos con CRUD, búsqueda, filtros, imágenes, paginación y soft delete validados. Productos y categorías no requieren seeders porque son datos propios de cada negocio. |
 | 04 - Clientes | 100 % | CRUD, Consumidor Final, búsqueda, historial, estadísticas y edición desde POS implementados y probados. |
-| 05 - Ventas | 90 % | POS, carrito, impuestos, descuento, métodos de pago, control de stock, ventas pendientes y anulaciones implementados. Pendiente validación integral del flujo. |
+| 05 - Ventas | 100 % | POS, carrito, impuestos, descuento, métodos de pago, control de stock, ventas pendientes y anulaciones implementados y validados. |
 | 06 - Dashboard | 10 % | La vista actual usa información demostrativa; faltan métricas reales, últimas ventas, stock bajo y gráfico. |
 | 07 - Reportes | 0 % | Pendientes reportes de ventas, inventario y clientes. |
 | 08 - Configuración | 90 % | Empresa, moneda, IVA y logo implementados; el IVA y la moneda se integran con ventas. |
@@ -66,16 +68,13 @@ Sprint 08 fue adelantado y está casi completo.
 ## Verificación técnica ejecutada
 
 - Contenedores `app`, `mysql`, `nginx` y `node`: activos; MySQL saludable.
-- Suite base: 30 pruebas aprobadas, 89 aserciones.
-- Suite de módulos: 98 pruebas aprobadas, 336 aserciones.
-- Total verificado: 128 pruebas y 425 aserciones aprobadas.
+- Suite unificada: 138 pruebas y 442 aserciones aprobadas.
 - Build Vite de producción: aprobado.
 - Las 17 migraciones aparecen aplicadas.
 - Laravel registró correctamente 78 rutas de aplicación.
 
-Nota: `php artisan test` ejecuta la suite base, pero no descubre automáticamente
-los tests ubicados en `Modules/*/tests`. Hasta ajustar `phpunit.xml`, la suite de
-módulos debe ejecutarse indicando explícitamente sus directorios.
+`phpunit.xml` incluye la suite base y todos los tests de `Modules/*/tests`, por lo
+que `php artisan test` valida el proyecto completo con un solo comando.
 
 Queda recomendada una prueba manual del flujo:
 
@@ -85,13 +84,11 @@ login -> cliente -> categoría -> producto -> venta -> anulación -> historial
 
 ## Próximas prioridades
 
-1. Probar manualmente el flujo completo de ventas.
-2. Ajustar `phpunit.xml` para incluir automáticamente los tests modulares.
-3. Decidir y aplicar el cierre del registro público para producción.
-4. Implementar Sprint 06 - Dashboard con datos reales.
-5. Implementar Sprint 07 - Reportes.
-6. Completar Sprint 09 - Calidad y pulido.
-7. Preparar Sprint 10 - Publicación y portafolio.
+1. Decidir y aplicar el cierre del registro público para producción.
+2. Implementar Sprint 06 - Dashboard con datos reales.
+3. Implementar Sprint 07 - Reportes.
+4. Completar Sprint 09 - Calidad y pulido.
+5. Preparar Sprint 10 - Publicación y portafolio.
 
 ## Notas
 

@@ -7,11 +7,9 @@ use InvalidArgumentException;
 use Livewire\Livewire;
 use Modules\Administration\Models\User;
 use Modules\Customers\Models\Customer;
-use Modules\Inventory\Models\Category;
 use Modules\Inventory\Models\Product;
 use Modules\Sales\Livewire\Pos\PosIndex;
 use Modules\Sales\Models\Sale;
-use Modules\Sales\Models\SaleItem;
 use Modules\Sales\Services\SaleService;
 use Modules\Settings\Models\Currency;
 use Modules\Settings\Models\Setting;
@@ -24,10 +22,15 @@ class SaleManagementTest extends TestCase
     use RefreshDatabase;
 
     protected User $adminUser;
+
     protected User $viewOnlyUser;
+
     protected User $unauthorizedUser;
+
     protected Customer $customer;
+
     protected Product $productA;
+
     protected Product $productB;
 
     protected function setUp(): void
@@ -50,22 +53,22 @@ class SaleManagementTest extends TestCase
         $adminRole->syncPermissions($permissions);
 
         $this->adminUser = User::create([
-            'name'     => 'Admin Cashier',
-            'email'    => 'cashier@velntra.test',
+            'name' => 'Admin Cashier',
+            'email' => 'cashier@velntra.test',
             'password' => bcrypt('password123'),
         ]);
         $this->adminUser->assignRole('admin');
 
         $this->viewOnlyUser = User::create([
-            'name'     => 'Viewer User',
-            'email'    => 'viewer@velntra.test',
+            'name' => 'Viewer User',
+            'email' => 'viewer@velntra.test',
             'password' => bcrypt('password123'),
         ]);
         $this->viewOnlyUser->givePermissionTo('sales.view');
 
         $this->unauthorizedUser = User::create([
-            'name'     => 'Unauthorized User',
-            'email'    => 'unauth@velntra.test',
+            'name' => 'Unauthorized User',
+            'email' => 'unauth@velntra.test',
             'password' => bcrypt('password123'),
         ]);
 
@@ -75,27 +78,27 @@ class SaleManagementTest extends TestCase
         );
 
         $this->productA = Product::create([
-            'sku'           => 'PROD-001',
-            'barcode'       => '7861001001',
-            'type'          => 'simple',
-            'name'          => 'Bebida Energética 500ml',
-            'price'         => 2.50,
-            'cost'          => 1.50,
-            'stock'         => 20,
+            'sku' => 'PROD-001',
+            'barcode' => '7861001001',
+            'type' => 'simple',
+            'name' => 'Bebida Energética 500ml',
+            'price' => 2.50,
+            'cost' => 1.50,
+            'stock' => 20,
             'minimum_stock' => 5,
-            'is_active'     => true,
+            'is_active' => true,
         ]);
 
         $this->productB = Product::create([
-            'sku'           => 'PROD-002',
-            'barcode'       => '7861001002',
-            'type'          => 'simple',
-            'name'          => 'Snack de Papas 150g',
-            'price'         => 1.80,
-            'cost'          => 1.00,
-            'stock'         => 15,
+            'sku' => 'PROD-002',
+            'barcode' => '7861001002',
+            'type' => 'simple',
+            'name' => 'Snack de Papas 150g',
+            'price' => 1.80,
+            'cost' => 1.00,
+            'stock' => 15,
             'minimum_stock' => 3,
-            'is_active'     => true,
+            'is_active' => true,
         ]);
 
         $currency = Currency::firstOrCreate(
@@ -106,8 +109,8 @@ class SaleManagementTest extends TestCase
         Setting::firstOrCreate(
             ['id' => 1],
             [
-                'company_name'   => 'Velntra Store',
-                'currency_id'    => $currency->id,
+                'company_name' => 'Velntra Store',
+                'currency_id' => $currency->id,
                 'tax_percentage' => 15.00,
             ]
         );
@@ -118,21 +121,21 @@ class SaleManagementTest extends TestCase
         $service = app(SaleService::class);
 
         $sale = $service->createSale([
-            'customer_id'    => $this->customer->id,
-            'user_id'        => $this->adminUser->id,
-            'discount'       => 0.00,
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->adminUser->id,
+            'discount' => 0.00,
             'payment_method' => 'cash',
-            'status'         => 'completed',
+            'status' => 'completed',
         ], [
             ['product_id' => $this->productA->id, 'quantity' => 2, 'price' => 2.50],
             ['product_id' => $this->productB->id, 'quantity' => 1, 'price' => 1.80],
         ]);
 
         $this->assertDatabaseHas('sales', [
-            'id'          => $sale->id,
+            'id' => $sale->id,
             'customer_id' => $this->customer->id,
-            'status'      => 'completed',
-            'subtotal'    => 6.80,
+            'status' => 'completed',
+            'subtotal' => 6.80,
         ]);
 
         // Stock decreased: 20 - 2 = 18 and 15 - 1 = 14
@@ -148,10 +151,146 @@ class SaleManagementTest extends TestCase
 
         $service->createSale([
             'customer_id' => $this->customer->id,
-            'user_id'     => $this->adminUser->id,
-            'status'      => 'completed',
+            'user_id' => $this->adminUser->id,
+            'status' => 'completed',
         ], [
             ['product_id' => $this->productA->id, 'quantity' => 999, 'price' => 2.50],
+        ]);
+    }
+
+    public function test_sale_service_rejects_empty_sale(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        app(SaleService::class)->createSale([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->adminUser->id,
+        ], []);
+    }
+
+    public function test_sale_service_rejects_non_positive_quantity(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        app(SaleService::class)->createSale([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->adminUser->id,
+        ], [
+            ['product_id' => $this->productA->id, 'quantity' => 0],
+        ]);
+    }
+
+    public function test_sale_service_rejects_inactive_product(): void
+    {
+        $this->productA->update(['is_active' => false]);
+        $this->expectException(InvalidArgumentException::class);
+
+        app(SaleService::class)->createSale([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->adminUser->id,
+        ], [
+            ['product_id' => $this->productA->id, 'quantity' => 1],
+        ]);
+    }
+
+    public function test_sale_service_copies_catalog_price_and_cost_instead_of_client_values(): void
+    {
+        $sale = app(SaleService::class)->createSale([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->adminUser->id,
+        ], [
+            [
+                'product_id' => $this->productA->id,
+                'quantity' => 2,
+                'price' => 0.01,
+                'cost' => 0.01,
+            ],
+        ]);
+
+        $item = $sale->items->first();
+        $this->assertEquals('2.50', $item->price);
+        $this->assertEquals('1.50', $item->cost);
+        $this->assertEquals('5.00', $sale->subtotal);
+    }
+
+    public function test_sale_service_calculates_discount_tax_and_total(): void
+    {
+        $sale = app(SaleService::class)->createSale([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->adminUser->id,
+            'discount' => 1.00,
+        ], [
+            ['product_id' => $this->productA->id, 'quantity' => 2],
+        ]);
+
+        $this->assertEquals('5.00', $sale->subtotal);
+        $this->assertEquals('1.00', $sale->discount);
+        $this->assertEquals('0.60', $sale->tax);
+        $this->assertEquals('4.60', $sale->total);
+    }
+
+    public function test_sale_service_rejects_discount_greater_than_subtotal(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        app(SaleService::class)->createSale([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->adminUser->id,
+            'discount' => 3.00,
+        ], [
+            ['product_id' => $this->productA->id, 'quantity' => 1],
+        ]);
+    }
+
+    public function test_sale_service_accepts_all_supported_payment_methods(): void
+    {
+        foreach (['cash', 'card', 'transfer'] as $index => $method) {
+            $product = Product::create([
+                'sku' => 'PAY-'.$index,
+                'name' => 'Payment product '.$index,
+                'price' => 1.00,
+                'cost' => 0.50,
+                'stock' => 1,
+                'minimum_stock' => 0,
+                'is_active' => true,
+            ]);
+
+            $sale = app(SaleService::class)->createSale([
+                'customer_id' => $this->customer->id,
+                'user_id' => $this->adminUser->id,
+                'payment_method' => $method,
+            ], [
+                ['product_id' => $product->id, 'quantity' => 1],
+            ]);
+
+            $this->assertSame($method, $sale->payment_method);
+        }
+    }
+
+    public function test_sale_service_rejects_unsupported_payment_method(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        app(SaleService::class)->createSale([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->adminUser->id,
+            'payment_method' => 'crypto',
+        ], [
+            ['product_id' => $this->productA->id, 'quantity' => 1],
+        ]);
+    }
+
+    public function test_sale_service_rejects_insufficient_cash_payment(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        app(SaleService::class)->createSale([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->adminUser->id,
+            'payment_method' => 'cash',
+            'amount_paid' => 1.00,
+        ], [
+            ['product_id' => $this->productA->id, 'quantity' => 1],
         ]);
     }
 
@@ -161,9 +300,9 @@ class SaleManagementTest extends TestCase
 
         $sale = $service->createSale([
             'customer_id' => $this->customer->id,
-            'user_id'     => $this->adminUser->id,
-            'status'      => 'pending',
-            'notes'       => 'Venta en espera para cliente regular',
+            'user_id' => $this->adminUser->id,
+            'status' => 'pending',
+            'notes' => 'Venta en espera para cliente regular',
         ], [
             ['product_id' => $this->productA->id, 'quantity' => 3, 'price' => 2.50],
         ]);
@@ -179,15 +318,15 @@ class SaleManagementTest extends TestCase
 
         $sale = $service->createSale([
             'customer_id' => $this->customer->id,
-            'user_id'     => $this->adminUser->id,
-            'status'      => 'pending',
+            'user_id' => $this->adminUser->id,
+            'status' => 'pending',
         ], [
             ['product_id' => $this->productA->id, 'quantity' => 4, 'price' => 2.50],
         ]);
 
         $completed = $service->completePendingSale($sale, [
             'payment_method' => 'card',
-            'amount_paid'    => $sale->total,
+            'amount_paid' => $sale->total,
         ]);
 
         $this->assertEquals('completed', $completed->status);
@@ -200,8 +339,8 @@ class SaleManagementTest extends TestCase
 
         $sale = $service->createSale([
             'customer_id' => $this->customer->id,
-            'user_id'     => $this->adminUser->id,
-            'status'      => 'completed',
+            'user_id' => $this->adminUser->id,
+            'status' => 'completed',
         ], [
             ['product_id' => $this->productA->id, 'quantity' => 5, 'price' => 2.50],
         ]);
@@ -212,6 +351,21 @@ class SaleManagementTest extends TestCase
 
         $this->assertEquals('cancelled', $cancelled->status);
         $this->assertEquals(20, $this->productA->fresh()->stock); // Restored
+    }
+
+    public function test_sale_service_cannot_cancel_same_sale_twice(): void
+    {
+        $service = app(SaleService::class);
+        $sale = $service->createSale([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->adminUser->id,
+        ], [
+            ['product_id' => $this->productA->id, 'quantity' => 2],
+        ]);
+
+        $service->cancelSale($sale);
+        $this->expectException(InvalidArgumentException::class);
+        $service->cancelSale($sale->fresh());
     }
 
     public function test_pos_index_component_authorizes_admin_and_renders(): void
@@ -240,8 +394,8 @@ class SaleManagementTest extends TestCase
             ->call('addToCart', $this->productA->id)
             ->call('addToCart', $this->productA->id)
             ->call('addToCart', $this->productB->id)
-            ->assertSet('cart.' . $this->productA->id . '.quantity', 2)
-            ->assertSet('cart.' . $this->productB->id . '.quantity', 1)
+            ->assertSet('cart.'.$this->productA->id.'.quantity', 2)
+            ->assertSet('cart.'.$this->productB->id.'.quantity', 1)
             ->assertViewHas('totals', function ($totals) {
                 return $totals['subtotal'] == 6.80 && $totals['items_count'] == 3;
             });
@@ -268,7 +422,7 @@ class SaleManagementTest extends TestCase
         // 2. Resume held sale into cart
         Livewire::test(PosIndex::class)
             ->call('resumeHeldSale', $heldSale->id)
-            ->assertSet('cart.' . $this->productA->id . '.quantity', 3)
+            ->assertSet('cart.'.$this->productA->id.'.quantity', 3)
             ->assertDispatched('toast');
     }
 
@@ -287,7 +441,7 @@ class SaleManagementTest extends TestCase
             ->assertDispatched('toast');
 
         $this->assertDatabaseHas('sales', [
-            'status'         => 'completed',
+            'status' => 'completed',
             'payment_method' => 'cash',
         ]);
 
@@ -301,8 +455,8 @@ class SaleManagementTest extends TestCase
         $service = app(SaleService::class);
         $sale = $service->createSale([
             'customer_id' => $this->customer->id,
-            'user_id'     => $this->adminUser->id,
-            'status'      => 'completed',
+            'user_id' => $this->adminUser->id,
+            'status' => 'completed',
         ], [
             ['product_id' => $this->productA->id, 'quantity' => 2, 'price' => 2.50],
         ]);
@@ -323,10 +477,10 @@ class SaleManagementTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $customer = Customer::create([
-            'name'     => 'Carlos Original',
+            'name' => 'Carlos Original',
             'document' => '1718192021',
-            'email'    => 'carlos.orig@velntra.test',
-            'phone'    => '0991112223',
+            'email' => 'carlos.orig@velntra.test',
+            'phone' => '0991112223',
         ]);
 
         Livewire::test(PosIndex::class)
@@ -349,7 +503,7 @@ class SaleManagementTest extends TestCase
         $this->actingAs($this->adminUser);
 
         Customer::create([
-            'name'     => 'Already Registered Client',
+            'name' => 'Already Registered Client',
             'document' => '1722334455',
         ]);
 

@@ -6,7 +6,6 @@ namespace Modules\Sales\Services;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
-
 // Models
 use Modules\Inventory\Models\Product;
 use Modules\Sales\Models\Sale;
@@ -17,9 +16,6 @@ class SaleService
 {
     /**
      * Buscar una venta por su ID o lanzar excepción.
-     *
-     * @param int $id
-     * @return Sale
      */
     public function find(int $id): Sale
     {
@@ -55,10 +51,10 @@ class SaleService
      * @param array<int, array{
      *     product_id: int,
      *     quantity: int,
-     *     price: float|numeric|string,
+     *     price?: float|numeric|string,
      *     cost?: float|numeric|string
      * }> $items
-     * @return Sale
+     *
      * @throws InvalidArgumentException
      */
     public function createSale(array $data, array $items): Sale
@@ -68,15 +64,29 @@ class SaleService
         }
 
         return DB::transaction(function () use ($data, $items) {
-            $isCompleted = ($data['status'] ?? 'completed') === 'completed';
+            $status = $data['status'] ?? 'completed';
+            if (! in_array($status, ['pending', 'completed'], true)) {
+                throw new InvalidArgumentException('El estado de la venta no es válido.');
+            }
+
+            $paymentMethod = $data['payment_method'] ?? 'cash';
+            if (! in_array($paymentMethod, ['cash', 'card', 'transfer'], true)) {
+                throw new InvalidArgumentException('El método de pago no es válido.');
+            }
+
+            $isCompleted = $status === 'completed';
 
             // 1. Validar existencias y preparar líneas de venta
             $calculatedSubtotal = 0.00;
             $itemsData = [];
 
             foreach ($items as $item) {
-                $product = Product::findOrFail($item['product_id']);
+                $product = Product::query()->lockForUpdate()->findOrFail($item['product_id']);
                 $quantity = (int) $item['quantity'];
+
+                if (! $product->is_active) {
+                    throw new InvalidArgumentException("El producto {$product->name} no está activo.");
+                }
 
                 if ($quantity <= 0) {
                     throw new InvalidArgumentException("La cantidad para {$product->name} debe ser mayor a cero.");
@@ -86,16 +96,18 @@ class SaleService
                     throw new InvalidArgumentException("Stock insuficiente para el producto: {$product->name}. Disponible: {$product->stock}, Solicitado: {$quantity}");
                 }
 
-                $price = (float) ($item['price'] ?? $product->price);
-                $cost = (float) ($item['cost'] ?? $product->cost);
+                // El precio y costo se copian desde el producto; nunca se confía
+                // en valores recibidos desde el estado público del componente.
+                $price = (float) $product->price;
+                $cost = (float) $product->cost;
                 $lineSubtotal = round($quantity * $price, 2);
                 $calculatedSubtotal += $lineSubtotal;
 
                 $itemsData[] = [
-                    'product'  => $product,
+                    'product' => $product,
                     'quantity' => $quantity,
-                    'price'    => $price,
-                    'cost'     => $cost,
+                    'price' => $price,
+                    'cost' => $cost,
                     'subtotal' => $lineSubtotal,
                 ];
             }
@@ -104,6 +116,11 @@ class SaleService
             $settings = Setting::getSettings();
             $taxRate = (float) ($settings->tax_percentage ?? 15.00);
             $discount = (float) ($data['discount'] ?? 0.00);
+
+            if ($discount < 0 || $discount > $calculatedSubtotal) {
+                throw new InvalidArgumentException('El descuento debe estar entre cero y el subtotal de la venta.');
+            }
+
             $taxableBase = max(0.00, $calculatedSubtotal - $discount);
             $taxAmount = round($taxableBase * ($taxRate / 100), 2);
             $total = round($taxableBase + $taxAmount, 2);
@@ -116,32 +133,36 @@ class SaleService
                 ? (float) $data['change']
                 : max(0.00, ($amountPaid ? $amountPaid - $total : 0.00));
 
+            if ($isCompleted && $paymentMethod === 'cash' && $amountPaid < $total) {
+                throw new InvalidArgumentException('El monto recibido no puede ser inferior al total de la venta.');
+            }
+
             // 3. Crear cabecera de venta
             $sale = Sale::create([
-                'number'         => Sale::generateNextNumber(),
-                'customer_id'    => $data['customer_id'],
-                'user_id'        => $data['user_id'],
-                'subtotal'       => $calculatedSubtotal,
-                'discount'       => $discount,
-                'tax'            => $taxAmount,
+                'number' => Sale::generateNextNumber(),
+                'customer_id' => $data['customer_id'],
+                'user_id' => $data['user_id'],
+                'subtotal' => $calculatedSubtotal,
+                'discount' => $discount,
+                'tax' => $taxAmount,
                 'tax_percentage' => $taxRate,
-                'total'          => $total,
-                'payment_method' => $data['payment_method'] ?? 'cash',
-                'amount_paid'    => $amountPaid,
-                'change'         => $change,
-                'status'         => $data['status'] ?? 'completed',
-                'notes'          => $data['notes'] ?? null,
+                'total' => $total,
+                'payment_method' => $paymentMethod,
+                'amount_paid' => $amountPaid,
+                'change' => $change,
+                'status' => $status,
+                'notes' => $data['notes'] ?? null,
             ]);
 
             // 4. Guardar items y descontar stock si es completada
             foreach ($itemsData as $row) {
                 SaleItem::create([
-                    'sale_id'    => $sale->id,
+                    'sale_id' => $sale->id,
                     'product_id' => $row['product']->id,
-                    'quantity'   => $row['quantity'],
-                    'price'      => $row['price'],
-                    'cost'       => $row['cost'],
-                    'subtotal'   => $row['subtotal'],
+                    'quantity' => $row['quantity'],
+                    'price' => $row['price'],
+                    'cost' => $row['cost'],
+                    'subtotal' => $row['subtotal'],
                 ]);
 
                 if ($isCompleted) {
@@ -156,14 +177,12 @@ class SaleService
     /**
      * Completar y cobrar una venta que estaba en espera (pending).
      *
-     * @param Sale $sale
      * @param array{
      *     payment_method: string,
      *     amount_paid: float|numeric|string,
      *     change?: float|numeric|string,
      *     notes?: string|null
      * } $paymentData
-     * @return Sale
      */
     public function completePendingSale(Sale $sale, array $paymentData): Sale
     {
@@ -172,12 +191,22 @@ class SaleService
         }
 
         return DB::transaction(function () use ($sale, $paymentData) {
+            $paymentMethod = $paymentData['payment_method'] ?? 'cash';
+            if (! in_array($paymentMethod, ['cash', 'card', 'transfer'], true)) {
+                throw new InvalidArgumentException('El método de pago no es válido.');
+            }
+
             // Validar stock de cada item
             foreach ($sale->items as $item) {
-                $product = $item->product;
+                $product = Product::query()->lockForUpdate()->findOrFail($item->product_id);
+                if (! $product->is_active) {
+                    throw new InvalidArgumentException("El producto {$product->name} no está activo.");
+                }
                 if ($product->stock < $item->quantity) {
                     throw new InvalidArgumentException("Stock insuficiente para: {$product->name}. Disponible: {$product->stock}");
                 }
+
+                $item->setRelation('product', $product);
             }
 
             // Descontar inventario
@@ -190,12 +219,16 @@ class SaleService
                 ? (float) $paymentData['change']
                 : max(0.00, $amountPaid - (float) $sale->total);
 
+            if ($paymentMethod === 'cash' && $amountPaid < (float) $sale->total) {
+                throw new InvalidArgumentException('El monto recibido no puede ser inferior al total de la venta.');
+            }
+
             $sale->update([
-                'payment_method' => $paymentData['payment_method'] ?? 'cash',
-                'amount_paid'    => $amountPaid,
-                'change'         => $change,
-                'status'         => 'completed',
-                'notes'          => $paymentData['notes'] ?? $sale->notes,
+                'payment_method' => $paymentMethod,
+                'amount_paid' => $amountPaid,
+                'change' => $change,
+                'status' => 'completed',
+                'notes' => $paymentData['notes'] ?? $sale->notes,
             ]);
 
             return $sale->fresh(['items.product', 'customer', 'user']);
@@ -204,10 +237,6 @@ class SaleService
 
     /**
      * Anular una venta completada y restaurar el stock automáticamente (BR-034 / BR-035).
-     *
-     * @param Sale $sale
-     * @param string|null $reason
-     * @return Sale
      */
     public function cancelSale(Sale $sale, ?string $reason = null): Sale
     {
@@ -225,7 +254,7 @@ class SaleService
 
             $sale->update([
                 'status' => 'cancelled',
-                'notes'  => $reason ? trim(($sale->notes ? $sale->notes . " | Anulación: " : "Anulación: ") . $reason) : $sale->notes,
+                'notes' => $reason ? trim(($sale->notes ? $sale->notes.' | Anulación: ' : 'Anulación: ').$reason) : $sale->notes,
             ]);
 
             return $sale->fresh(['items.product', 'customer', 'user']);
@@ -234,9 +263,6 @@ class SaleService
 
     /**
      * Eliminar definitivamente una venta pausada / en espera.
-     *
-     * @param Sale $sale
-     * @return bool
      */
     public function deletePendingSale(Sale $sale): bool
     {
@@ -246,6 +272,7 @@ class SaleService
 
         return DB::transaction(function () use ($sale) {
             $sale->items()->delete();
+
             return (bool) $sale->forceDelete();
         });
     }
