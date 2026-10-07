@@ -18,7 +18,7 @@ completo.
 | Sprint | Estado | Observaciones |
 | --- | ---: | --- |
 | 01 - Base | 100 % | Proyecto, Docker, módulos, autenticación, MySQL y dependencias configurados. |
-| 02 - Administración | 100 % | Usuarios, roles, permisos, perfil, servicios, policies y pruebas validadas. El cierre del registro público queda como decisión previa a producción. |
+| 02 - Administración | 100 % | Usuarios, roles, permisos, perfil, servicios, policies y pruebas validadas. El registro público está deshabilitado; las cuentas se administran internamente. |
 | 03 - Inventario | 100 % | Categorías y productos con CRUD, búsqueda, filtros, imágenes, paginación y soft delete validados. Productos y categorías no requieren seeders porque son datos propios de cada negocio. |
 | 04 - Clientes | 100 % | CRUD, Consumidor Final, búsqueda, historial, estadísticas y edición desde POS implementados y probados. |
 | 05 - Ventas | 100 % | POS, carrito, impuestos, descuento, métodos de pago, control de stock, ventas pendientes y anulaciones implementados y validados. |
@@ -58,6 +58,8 @@ completo.
 - Los módulos Core, Administration, Dashboard, Inventory, Customers, Sales y
   Settings están creados y habilitados.
 - Administración incluye usuarios, roles, permisos, perfil y cambio de contraseña.
+- El registro público está deshabilitado; los usuarios se crean desde el módulo
+  de Administración o mediante el administrador inicial estructural.
 - Inventario incluye categorías, productos, imágenes, filtros, búsqueda y stock.
 - Clientes incluye Consumidor Final, CRUD e historial de compras.
 - Ventas incluye POS, carrito, ventas pendientes, cobro, descuento de stock y
@@ -72,7 +74,7 @@ completo.
 ## Verificación técnica ejecutada
 
 - Contenedores `app`, `mysql`, `nginx` y `node`: activos; MySQL saludable.
-- Suite unificada: 147 pruebas y 470 aserciones aprobadas.
+- Suite unificada: 146 pruebas y 468 aserciones aprobadas.
 - Build Vite de producción: aprobado.
 - Las 17 migraciones aparecen aplicadas.
 - Laravel registró correctamente 78 rutas de aplicación.
@@ -91,10 +93,9 @@ login -> cliente -> categoría -> producto -> venta -> anulación -> historial
 
 ## Próximas prioridades
 
-1. Aplicar el cierre del registro público aprobado para producción.
-2. Implementar Sprint 07 - Reportes.
-3. Completar Sprint 09 - Calidad y pulido.
-4. Preparar Sprint 10 - Publicación y portafolio.
+1. Implementar Sprint 07 - Reportes.
+2. Completar Sprint 09 - Calidad y pulido.
+3. Preparar Sprint 10 - Publicación y portafolio.
 
 ## Notas
 
