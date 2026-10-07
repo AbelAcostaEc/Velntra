@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'export_excel' => 'Export Excel',
+    'export_pdf' => 'Export PDF',
     'sales_report' => 'Sales report',
     'inventory_report' => 'Inventory report',
     'customer_report' => 'Customer report',

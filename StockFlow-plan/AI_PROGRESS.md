@@ -24,7 +24,7 @@ está casi completo.
 | 04 - Clientes | 100 % | CRUD, Consumidor Final, búsqueda, historial, estadísticas y edición desde POS implementados y probados. |
 | 05 - Ventas | 100 % | POS, carrito, impuestos, descuento, métodos de pago, control de stock, ventas pendientes y anulaciones implementados y validados. |
 | 06 - Dashboard | 100 % | Métricas reales, últimas ventas, stock bajo, gráfico con períodos predefinidos y rango personalizado, accesos rápidos, permisos y diseño responsive implementados y probados. |
-| 07 - Reportes | 100 % | Reportes independientes de ventas, inventario y clientes con filtros, métricas, paginación, permisos y pruebas. |
+| 07 - Reportes | 100 % | Reportes independientes de ventas, inventario y clientes con filtros, métricas, paginación, permisos, exportación Excel/PDF y pruebas. |
 | 08 - Configuración | 90 % | Empresa, moneda, IVA y logo implementados; el IVA y la moneda se integran con ventas. |
 | 09 - Calidad | 40 % | Existe una suite amplia de feature tests; faltan ejecución certificada, revisión responsive y flujo integral. |
 | 10 - Publicación | 5 % | Pendientes README, guía final, capturas, demo y despliegue. |
@@ -69,7 +69,8 @@ está casi completo.
   últimas ventas, alertas de stock bajo y evolución por últimos siete días, mes
   actual, mes anterior o un rango personalizado de hasta 93 días.
 - Reportes incluye componentes y rutas independientes para ventas, inventario y
-  clientes. Las métricas excluyen ventas pendientes y anuladas.
+  clientes. Cada reporte exporta el conjunto filtrado completo en Excel y PDF;
+  las métricas excluyen ventas pendientes y anuladas.
 - Configuración incluye información de empresa, logo, IVA y moneda.
 - Hay pruebas feature para administración, inventario, clientes, ventas,
   dashboard y configuración, además de autenticación, perfil e idioma.
@@ -77,7 +78,7 @@ está casi completo.
 ## Verificación técnica ejecutada
 
 - Contenedores `app`, `mysql`, `nginx` y `node`: activos; MySQL saludable.
-- Suite unificada: 153 pruebas y 498 aserciones aprobadas.
+- Suite unificada: 154 pruebas y 504 aserciones aprobadas.
 - Build Vite de producción: aprobado.
 - Las 17 migraciones aparecen aplicadas.
 - Laravel registró correctamente 78 rutas de aplicación.

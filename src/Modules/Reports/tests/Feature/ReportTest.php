@@ -146,6 +146,34 @@ class ReportTest extends TestCase
             ->assertHasErrors(['dateTo']);
     }
 
+    public function test_each_report_can_be_exported_to_excel_and_pdf(): void
+    {
+        Product::create($this->productData('EXPORT-001', 'Export product', 5, 2, 4));
+        $this->createSale('VTA-EXPORT-001', $this->customer, 'completed', 25, 3, now());
+        $this->actingAs($this->authorizedUser);
+
+        Livewire::test(SalesReport::class)
+            ->call('exportExcel')
+            ->assertFileDownloaded('reporte-ventas-2026-10-01-2026-10-07.xlsx');
+        Livewire::test(SalesReport::class)
+            ->call('exportPdf')
+            ->assertFileDownloaded('reporte-ventas-2026-10-01-2026-10-07.pdf');
+
+        Livewire::test(InventoryReport::class)
+            ->call('exportExcel')
+            ->assertFileDownloaded('reporte-inventario-2026-10-07.xlsx');
+        Livewire::test(InventoryReport::class)
+            ->call('exportPdf')
+            ->assertFileDownloaded('reporte-inventario-2026-10-07.pdf');
+
+        Livewire::test(CustomerReport::class)
+            ->call('exportExcel')
+            ->assertFileDownloaded('reporte-clientes-2026-01-01-2026-10-07.xlsx');
+        Livewire::test(CustomerReport::class)
+            ->call('exportPdf')
+            ->assertFileDownloaded('reporte-clientes-2026-01-01-2026-10-07.pdf');
+    }
+
     /** @return array<string, mixed> */
     private function productData(string $sku, string $name, int $stock, int $minimumStock, float $price): array
     {

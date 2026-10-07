@@ -2,11 +2,15 @@
 
 namespace Modules\Reports\Livewire;
 
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
+use Modules\Reports\Exports\CustomerReportExport;
 use Modules\Reports\Services\ReportService;
+use Modules\Settings\Models\Setting;
 
 class CustomerReport extends Component
 {
@@ -29,10 +33,7 @@ class CustomerReport extends Component
 
     public function applyFilters(): void
     {
-        $this->validate([
-            'dateFrom' => ['required', 'date'],
-            'dateTo' => ['required', 'date', 'after_or_equal:dateFrom'],
-        ]);
+        $this->validate($this->dateRules());
         $this->resetPage();
     }
 
@@ -44,6 +45,38 @@ class CustomerReport extends Component
         }
     }
 
+    public function exportExcel(ReportService $reports): mixed
+    {
+        Gate::authorize('reports.view');
+        $this->validate($this->dateRules());
+
+        return Excel::download(
+            new CustomerReportExport($reports->customersQuery($this->dateFrom, $this->dateTo, $this->search)->get()),
+            "reporte-clientes-{$this->dateFrom}-{$this->dateTo}.xlsx",
+        );
+    }
+
+    public function exportPdf(ReportService $reports): mixed
+    {
+        Gate::authorize('reports.view');
+        $this->validate($this->dateRules());
+
+        $pdf = Pdf::loadView('reports::pdf.customers', [
+            'customers' => $reports->customersQuery($this->dateFrom, $this->dateTo, $this->search)->get(),
+            'summary' => $reports->customersSummary($this->dateFrom, $this->dateTo, $this->search),
+            'currency' => $reports->currency(),
+            'settings' => Setting::getSettings(),
+            'dateFrom' => $this->dateFrom,
+            'dateTo' => $this->dateTo,
+        ])->setPaper('a4', 'landscape');
+
+        return response()->streamDownload(
+            fn () => print $pdf->output(),
+            "reporte-clientes-{$this->dateFrom}-{$this->dateTo}.pdf",
+            ['Content-Type' => 'application/pdf'],
+        );
+    }
+
     public function render(ReportService $reports): View
     {
         Gate::authorize('reports.view');
@@ -53,5 +86,14 @@ class CustomerReport extends Component
             'summary' => $reports->customersSummary($this->dateFrom, $this->dateTo, $this->search),
             'currency' => $reports->currency(),
         ]);
+    }
+
+    /** @return array<string, list<string>> */
+    private function dateRules(): array
+    {
+        return [
+            'dateFrom' => ['required', 'date'],
+            'dateTo' => ['required', 'date', 'after_or_equal:dateFrom'],
+        ];
     }
 }
