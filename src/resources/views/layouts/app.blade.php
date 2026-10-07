@@ -95,11 +95,14 @@
                             </x-sidebar-item>
                         @endcan
 
-                        @canany(['reports.view', 'sales.view'])
-                            <x-sidebar-item href="{{ Route::has('reports.index') ? route('reports.index') : '#' }}" :label="__t('nav_reports', 'administration')" :active="request()->routeIs('reports.*')">
-                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5 19V5m0 14h14M9 15v-4m4 4V7m4 8V9"/></svg>
-                            </x-sidebar-item>
-                        @endcanany
+                        @can('reports.view')
+                            <x-sidebar-group :label="__t('nav_reports', 'administration')" :open="request()->routeIs('reports.*')">
+                                <x-slot:icon><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5 19V5m0 14h14M9 15v-4m4 4V7m4 8V9"/></svg></x-slot:icon>
+                                <x-sidebar-item href="{{ route('reports.sales') }}" :label="__t('sales_report', 'reports')" :active="request()->routeIs('reports.sales')" nested />
+                                <x-sidebar-item href="{{ route('reports.inventory') }}" :label="__t('inventory_report', 'reports')" :active="request()->routeIs('reports.inventory')" nested />
+                                <x-sidebar-item href="{{ route('reports.customers') }}" :label="__t('customer_report', 'reports')" :active="request()->routeIs('reports.customers')" nested />
+                            </x-sidebar-group>
+                        @endcan
 
                         @canany(['settings.view', 'settings.update'])
                             <x-sidebar-item href="{{ Route::has('settings.index') ? route('settings.index') : '#' }}" :label="__t('nav_settings', 'administration')" :active="request()->routeIs('settings.*')">

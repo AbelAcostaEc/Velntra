@@ -2,14 +2,15 @@
 
 ## Estado actual
 
-Sprint actual: Sprint 07 - Reportes.
+Sprint actual: Sprint 09 - Calidad y pulido.
 
 Estado general: núcleo operativo del MVP implementado. Los Sprints 01 a 04 están
 completos y validados mediante pruebas automatizadas y build en Docker. El
 Sprint 05 quedó validado con pruebas automatizadas reforzadas y con la prueba
 manual integral previamente realizada. El Sprint 06 ya funciona con datos
-reales y quedó cubierto por pruebas. El Sprint 08 fue adelantado y está casi
-completo.
+reales y quedó cubierto por pruebas. El Sprint 07 quedó implementado mediante
+tres componentes de reportes independientes. El Sprint 08 fue adelantado y
+está casi completo.
 
 Última actualización: 2026-10-07.
 
@@ -23,7 +24,7 @@ completo.
 | 04 - Clientes | 100 % | CRUD, Consumidor Final, búsqueda, historial, estadísticas y edición desde POS implementados y probados. |
 | 05 - Ventas | 100 % | POS, carrito, impuestos, descuento, métodos de pago, control de stock, ventas pendientes y anulaciones implementados y validados. |
 | 06 - Dashboard | 100 % | Métricas reales, últimas ventas, stock bajo, gráfico con períodos predefinidos y rango personalizado, accesos rápidos, permisos y diseño responsive implementados y probados. |
-| 07 - Reportes | 0 % | Pendientes reportes de ventas, inventario y clientes. |
+| 07 - Reportes | 100 % | Reportes independientes de ventas, inventario y clientes con filtros, métricas, paginación, permisos y pruebas. |
 | 08 - Configuración | 90 % | Empresa, moneda, IVA y logo implementados; el IVA y la moneda se integran con ventas. |
 | 09 - Calidad | 40 % | Existe una suite amplia de feature tests; faltan ejecución certificada, revisión responsive y flujo integral. |
 | 10 - Publicación | 5 % | Pendientes README, guía final, capturas, demo y despliegue. |
@@ -67,6 +68,8 @@ completo.
 - Dashboard incluye ventas del día y del mes, productos y clientes activos,
   últimas ventas, alertas de stock bajo y evolución por últimos siete días, mes
   actual, mes anterior o un rango personalizado de hasta 93 días.
+- Reportes incluye componentes y rutas independientes para ventas, inventario y
+  clientes. Las métricas excluyen ventas pendientes y anuladas.
 - Configuración incluye información de empresa, logo, IVA y moneda.
 - Hay pruebas feature para administración, inventario, clientes, ventas,
   dashboard y configuración, además de autenticación, perfil e idioma.
@@ -74,7 +77,7 @@ completo.
 ## Verificación técnica ejecutada
 
 - Contenedores `app`, `mysql`, `nginx` y `node`: activos; MySQL saludable.
-- Suite unificada: 146 pruebas y 468 aserciones aprobadas.
+- Suite unificada: 153 pruebas y 498 aserciones aprobadas.
 - Build Vite de producción: aprobado.
 - Las 17 migraciones aparecen aplicadas.
 - Laravel registró correctamente 78 rutas de aplicación.
@@ -93,8 +96,8 @@ login -> cliente -> categoría -> producto -> venta -> anulación -> historial
 
 ## Próximas prioridades
 
-1. Implementar Sprint 07 - Reportes.
-2. Completar Sprint 09 - Calidad y pulido.
+1. Completar Sprint 09 - Calidad y pulido.
+2. Cerrar los pendientes menores del Sprint 08 - Configuración.
 3. Preparar Sprint 10 - Publicación y portafolio.
 
 ## Notas

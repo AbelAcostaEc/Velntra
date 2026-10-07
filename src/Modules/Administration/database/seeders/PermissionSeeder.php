@@ -58,6 +58,9 @@ class PermissionSeeder extends Seeder
                 'sales.delete',
                 'sales.cancel',
             ],
+            'reports' => [
+                'reports.view',
+            ],
             'settings' => [
                 'settings.view',
                 'settings.update',
@@ -75,5 +78,3 @@ class PermissionSeeder extends Seeder
         }
     }
 }
-
-
