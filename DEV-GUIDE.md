@@ -51,6 +51,19 @@ Desde la raíz del proyecto:
 docker compose up -d --build
 ```
 
+El contenedor `app` ejecuta automáticamente `php artisan migrate --force` y
+`php artisan db:seed --force` antes de iniciar PHP-FPM. Esto también reconstruye
+la base mínima del sistema después de usar `docker compose down -v`.
+
+El administrador inicial es:
+
+```text
+Usuario: admin@velntra.com
+Contraseña: admin@velntra.com
+```
+
+Cambia esta contraseña desde el perfil cuando prepares un entorno real.
+
 Verifica el estado:
 
 ```bash
@@ -88,11 +101,11 @@ DB_USERNAME=velntra
 DB_PASSWORD=secret
 ```
 
-Luego ejecuta:
+La generación de la clave sigue siendo manual cuando se crea por primera vez el
+archivo `src/.env`:
 
 ```bash
 docker compose exec app php artisan key:generate
-docker compose exec app php artisan migrate
 ```
 
 Si Laravel necesita corregir permisos:

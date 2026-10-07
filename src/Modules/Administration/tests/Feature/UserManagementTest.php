@@ -2,6 +2,7 @@
 
 namespace Modules\Administration\Tests\Feature;
 
+use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Modules\Administration\Livewire\Users\UserIndex;
@@ -15,9 +16,24 @@ class UserManagementTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_root_database_seeder_provisions_default_administrator(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $admin = User::where('email', 'admin@velntra.com')->first();
+
+        $this->assertNotNull($admin);
+        $this->assertNotNull($admin->email_verified_at);
+        $this->assertTrue($admin->hasRole('admin'));
+        $this->assertTrue($admin->can('users.create'));
+    }
+
     protected User $adminUser;
+
     protected User $regularUser;
+
     protected Role $adminRole;
+
     protected Role $sellerRole;
 
     protected function setUp(): void
@@ -239,8 +255,8 @@ class UserManagementTest extends TestCase
 
         Livewire::test(UserIndex::class)
             ->set('perPage', 5)
-            ->assertViewHas('users', fn($users) => $users->perPage() === 5)
+            ->assertViewHas('users', fn ($users) => $users->perPage() === 5)
             ->set('perPage', 20)
-            ->assertViewHas('users', fn($users) => $users->perPage() === 20);
+            ->assertViewHas('users', fn ($users) => $users->perPage() === 20);
     }
 }

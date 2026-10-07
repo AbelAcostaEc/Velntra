@@ -30,6 +30,9 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 COPY php.ini /usr/local/etc/php/conf.d/custom.ini
+COPY start-container.sh /usr/local/bin/velntra-start
+
+RUN chmod +x /usr/local/bin/velntra-start
 
 RUN printf '[www]\nlisten = 0.0.0.0:9000\n' > /usr/local/etc/php-fpm.d/zz-listen.conf
 
@@ -41,3 +44,5 @@ RUN groupmod -o -g ${WWWGROUP} www-data \
 WORKDIR /var/www/html
 
 USER www-data
+
+CMD ["/usr/local/bin/velntra-start"]

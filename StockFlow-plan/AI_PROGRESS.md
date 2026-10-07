@@ -68,10 +68,13 @@ completo.
 ## Verificación técnica ejecutada
 
 - Contenedores `app`, `mysql`, `nginx` y `node`: activos; MySQL saludable.
-- Suite unificada: 138 pruebas y 442 aserciones aprobadas.
+- Suite unificada: 139 pruebas y 446 aserciones aprobadas.
 - Build Vite de producción: aprobado.
 - Las 17 migraciones aparecen aplicadas.
 - Laravel registró correctamente 78 rutas de aplicación.
+- El contenedor `app` ejecuta migraciones y seeders estructurales al arrancar;
+  después de recrear el volumen quedan disponibles permisos, roles y el
+  administrador inicial.
 
 `phpunit.xml` incluye la suite base y todos los tests de `Modules/*/tests`, por lo
 que `php artisan test` valida el proyecto completo con un solo comando.
