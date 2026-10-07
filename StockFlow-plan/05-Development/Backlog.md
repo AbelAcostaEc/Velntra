@@ -68,7 +68,7 @@ P1
 
 ### STK-003
 
-Configure PostgreSQL
+Configure MySQL
 
 Priority
 

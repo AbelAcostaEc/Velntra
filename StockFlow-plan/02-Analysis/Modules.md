@@ -96,10 +96,9 @@ Administrar la seguridad y acceso al sistema.
 
 - UserService
 
-## Requests
+## Validación
 
-- StoreUserRequest
-- UpdateUserRequest
+- Reglas definidas en los componentes Livewire.
 
 ---
 
@@ -166,17 +165,9 @@ Este módulo será ampliado en futuras versiones.
 - ProductService
 - CategoryService
 
-## Requests
+## Validación
 
-### Categorías
-
-- StoreCategoryRequest
-- UpdateCategoryRequest
-
-### Productos
-
-- StoreProductRequest
-- UpdateProductRequest
+- Reglas de categorías y productos definidas en sus componentes Livewire.
 
 ---
 
@@ -203,10 +194,9 @@ Administrar los clientes.
 
 - CustomerService
 
-## Requests
+## Validación
 
-- StoreCustomerRequest
-- UpdateCustomerRequest
+- Reglas definidas en los componentes Livewire de clientes.
 
 ---
 
@@ -248,9 +238,14 @@ Registrar todas las ventas realizadas.
 
 - SaleService
 
-## Requests
+`SaleService` encapsula las operaciones transaccionales de creación,
+finalización, anulación y eliminación de ventas pendientes. Las Actions no son
+obligatorias; solo se separarán cuando una operación resulte difícil de
+comprender, reutilizar o probar dentro del servicio.
 
-- StoreSaleRequest
+## Validación
+
+- Reglas definidas en los componentes Livewire de ventas.
 
 ---
 
@@ -279,9 +274,9 @@ Administrar la configuración general del negocio.
 
 - SettingService
 
-## Requests
+## Validación
 
-- UpdateSettingRequest
+- Reglas definidas en los componentes Livewire de configuración.
 
 ---
 
@@ -313,8 +308,6 @@ Providers/
 
 Repositories/
 
-Requests/
-
 Resources/
 
 Routes/
@@ -342,11 +335,11 @@ Ejemplo
 
 ---
 
-## Requests
+## Validación Livewire
 
-Todas las validaciones deberán implementarse mediante Form Requests.
-
-No se realizarán validaciones directamente en Controllers o Livewire Components.
+Los flujos Livewire validarán la entrada mediante `rules()`, `#[Validate]` o
+Livewire Form Objects. Las reglas de negocio críticas permanecerán en los
+Services para no depender exclusivamente de la interfaz.
 
 ---
 

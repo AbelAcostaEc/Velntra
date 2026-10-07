@@ -215,10 +215,9 @@ Future
 
 Use Modular Monolith.
 
-Each module owns:
+Each module owns, when applicable:
 
 - Models
-- Requests
 - Policies
 - Services
 - Livewire Components
@@ -227,11 +226,14 @@ Each module owns:
 - Factories
 - Tests
 
-Business logic MUST stay inside Services or Actions.
+Business logic MUST stay inside Services. Actions are optional and will only be
+introduced when an operation becomes difficult to understand, reuse, or test
+inside its service.
 
 Do not place business logic inside Livewire Components.
 
-Use Form Requests.
+Livewire components validate input with `rules()`, `#[Validate]`, or Livewire
+Form Objects. Form Requests are not required for Livewire flows.
 
 Use Policies.
 

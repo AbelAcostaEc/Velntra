@@ -365,9 +365,9 @@ SaleRepository
 
 ---
 
-# Actions
+# Optional Actions
 
-Use a verb.
+When an operation is intentionally extracted from a Service, use a verb.
 
 Examples
 
@@ -403,21 +403,10 @@ SalePolicy
 
 ---
 
-# Requests
+# Livewire Validation
 
-Action + Model + Request
-
-Examples
-
-```text
-StoreProductRequest
-
-UpdateProductRequest
-
-StoreSaleRequest
-
-UpdateCustomerRequest
-```
+Use `rules()`, `#[Validate]`, or a Livewire Form Object. Form Requests are not
+part of the standard Livewire flow in Velntra.
 
 ---
 
@@ -844,7 +833,7 @@ Product.php
 
 ProductService.php
 
-StoreProductRequest.php
+ProductForm.php
 ```
 
 Markdown documents

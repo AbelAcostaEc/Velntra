@@ -81,8 +81,7 @@ Implementar usuarios, roles y permisos.
 * Crear CRUD de usuarios.
 * Crear UserService.
 * Crear UserPolicy.
-* Crear StoreUserRequest.
-* Crear UpdateUserRequest.
+* Implementar validación en los componentes Livewire de usuarios.
 * Crear vista de perfil.
 * Crear cambio de contraseña.
 
@@ -111,11 +110,9 @@ Implementar categorías y productos.
 
 * Crear migración `categories`.
 * Crear modelo `Category`.
-* Crear factory.
-* Crear seeder.
+* Agregar datos de prueba únicamente cuando sean necesarios para tests o demo.
 * Crear CategoryService.
-* Crear StoreCategoryRequest.
-* Crear UpdateCategoryRequest.
+* Implementar validación en el componente Livewire de categorías.
 * Crear CategoryPolicy.
 * Crear CRUD con Livewire.
 * Agregar búsqueda.
@@ -126,11 +123,9 @@ Implementar categorías y productos.
 
 * Crear migración `products`.
 * Crear modelo `Product`.
-* Crear factory.
-* Crear seeder.
+* Agregar datos de prueba únicamente cuando sean necesarios para tests o demo.
 * Crear ProductService.
-* Crear StoreProductRequest.
-* Crear UpdateProductRequest.
+* Implementar validación en el componente Livewire de productos.
 * Crear ProductPolicy.
 * Crear CRUD con Livewire.
 * Subir imagen de producto.
@@ -168,8 +163,7 @@ Implementar gestión de clientes.
 * Crear seeder.
 * Crear cliente por defecto: `Consumidor Final`.
 * Crear CustomerService.
-* Crear StoreCustomerRequest.
-* Crear UpdateCustomerRequest.
+* Implementar validación en el componente Livewire de clientes.
 * Crear CustomerPolicy.
 * Crear CRUD con Livewire.
 * Agregar búsqueda.
@@ -203,10 +197,10 @@ Implementar el flujo completo de ventas.
 * Crear modelo `Sale`.
 * Crear modelo `SaleItem`.
 * Crear SaleService.
-* Crear CreateSaleAction.
-* Crear CancelSaleAction.
-* Crear GenerateSaleNumberAction.
-* Crear StoreSaleRequest.
+* Encapsular en `SaleService` la creación, finalización y anulación de ventas.
+* Separar Actions solo si una operación se vuelve difícil de comprender,
+  reutilizar o probar dentro de `SaleService`.
+* Implementar validación en el componente Livewire del POS.
 * Crear SalePolicy.
 * Crear pantalla de venta tipo POS.
 * Buscar productos.
@@ -319,7 +313,7 @@ Permitir configurar la información del negocio.
 * Crear migración `settings`.
 * Crear modelo `Setting`.
 * Crear SettingService.
-* Crear UpdateSettingRequest.
+* Implementar validación en el componente Livewire de configuración.
 * Crear SettingPolicy.
 * Crear formulario de configuración.
 * Guardar nombre del negocio.

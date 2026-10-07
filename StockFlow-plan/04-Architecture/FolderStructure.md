@@ -42,7 +42,9 @@ Modules/
 └── Settings/
 ```
 
-Each module owns its own domain logic, routes, models, requests, services, policies, migrations, seeders, factories, and Livewire components.
+Each module owns its own domain logic, routes, models, services, policies,
+migrations, tests, and Livewire components. Seeders and factories are added only
+when the module needs system data, automated test data, or demo data.
 
 ---
 
@@ -116,7 +118,6 @@ Modules/{ModuleName}/
 │   └── Seeders/
 │
 ├── app/
-│   ├── Actions/
 │   ├── Enums/
 │   ├── Http/
 │   │   ├── Controllers/
@@ -127,7 +128,6 @@ Modules/{ModuleName}/
 │   ├── Policies/
 │   ├── Providers/
 │   ├── Repositories/
-│   ├── Requests/
 │   └── Services/
 │
 ├── resources/
@@ -196,7 +196,6 @@ Modules/Administration/
 │   │
 │   ├── Models/
 │   ├── Policies/
-│   ├── Requests/
 │   └── Services/
 ```
 
@@ -212,8 +211,6 @@ Main classes:
 
 ```text
 UserService
-StoreUserRequest
-UpdateUserRequest
 UserPolicy
 ```
 
@@ -256,7 +253,6 @@ Modules/Inventory/
 │   │
 │   ├── Models/
 │   ├── Policies/
-│   ├── Requests/
 │   ├── Services/
 │   └── Enums/
 ```
@@ -283,10 +279,6 @@ Category
 Product
 CategoryService
 ProductService
-StoreCategoryRequest
-UpdateCategoryRequest
-StoreProductRequest
-UpdateProductRequest
 CategoryPolicy
 ProductPolicy
 ProductType
@@ -302,7 +294,6 @@ Modules/Customers/
 │   ├── Livewire/
 │   ├── Models/
 │   ├── Policies/
-│   ├── Requests/
 │   └── Services/
 ```
 
@@ -317,8 +308,6 @@ Main classes:
 ```text
 Customer
 CustomerService
-StoreCustomerRequest
-UpdateCustomerRequest
 CustomerPolicy
 ```
 
@@ -329,12 +318,10 @@ CustomerPolicy
 ```text
 Modules/Sales/
 ├── app/
-│   ├── Actions/
 │   ├── Enums/
 │   ├── Livewire/
 │   ├── Models/
 │   ├── Policies/
-│   ├── Requests/
 │   └── Services/
 ```
 
@@ -353,9 +340,6 @@ Main classes:
 Sale
 SaleItem
 SaleService
-CancelSaleAction
-CreateSaleAction
-StoreSaleRequest
 SalePolicy
 SaleStatus
 PaymentMethod
@@ -371,7 +355,6 @@ Modules/Settings/
 │   ├── Livewire/
 │   ├── Models/
 │   ├── Policies/
-│   ├── Requests/
 │   └── Services/
 ```
 
@@ -387,7 +370,6 @@ Main classes:
 ```text
 Setting
 SettingService
-UpdateSettingRequest
 SettingPolicy
 ```
 
@@ -463,21 +445,6 @@ DashboardService
 
 ---
 
-## Requests
-
-Action + Model + `Request`.
-
-```text
-StoreProductRequest
-UpdateProductRequest
-StoreCustomerRequest
-UpdateCustomerRequest
-StoreSaleRequest
-UpdateSettingRequest
-```
-
----
-
 ## Policies
 
 Model name + `Policy`.
@@ -543,7 +510,8 @@ Modules/Inventory/resources/views/livewire/products/
 
 # Service Layer Rule
 
-Business logic must live inside Services or Actions.
+Business logic must live inside Services. Actions are optional extraction units,
+not a required layer.
 
 Livewire components should not contain heavy business logic.
 
@@ -571,20 +539,11 @@ $this->saleService->createSale($validatedData);
 
 ---
 
-# Action Classes
+# Optional Action Classes
 
-Actions are used for specific business operations.
-
-Examples:
-
-```text
-CreateSaleAction
-CancelSaleAction
-RestoreStockAction
-GenerateSaleNumberAction
-```
-
-Use Actions when a process has several steps or affects multiple models.
+An Action may be extracted when a Service operation becomes difficult to
+understand, reuse, or test. `SaleService` is the approved owner of transactional
+sale operations for v1.0; Actions must not be created only to add another layer.
 
 ---
 
@@ -606,21 +565,11 @@ Do not create repositories just to wrap simple Eloquent calls.
 
 ---
 
-# Request Validation Rule
+# Livewire Validation Rule
 
-Validation must live inside Form Requests whenever possible.
-
-Example:
-
-```text
-StoreProductRequest
-UpdateProductRequest
-StoreSaleRequest
-```
-
-Livewire components may use simple inline validation only for temporary UI state.
-
-Business validation must remain centralized.
+Livewire input is validated with `rules()`, `#[Validate]`, or Livewire Form
+Objects. Form Requests are not required for Livewire flows. Critical business
+rules must also be enforced by the relevant Service.
 
 ---
 
@@ -784,23 +733,9 @@ Route
 ↓
 Livewire Component
 ↓
-Form Request / Validation
-↓
-Service / Action
-↓
-Model
-↓
-Database
-```
-
-For complex processes:
-
-```text
-Livewire Component
+Livewire Validation
 ↓
 Service
-↓
-Action
 ↓
 Model
 ↓
@@ -813,8 +748,6 @@ Example sale flow:
 SaleCreate
 ↓
 SaleService
-↓
-CreateSaleAction
 ↓
 Sale / SaleItem / Product
 ↓
