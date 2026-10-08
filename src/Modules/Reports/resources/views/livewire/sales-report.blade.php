@@ -2,8 +2,8 @@
     <x-slot name="header">
         <x-page-header :title="__t('sales_report', 'reports')" :description="__t('sales_description', 'reports')">
             <x-slot:actions>
-                <button type="button" wire:click="exportExcel" wire:loading.class="pointer-events-none opacity-50" wire:target="exportExcel" class="inline-flex h-10 items-center rounded-xl border border-emerald-300 bg-white px-4 text-sm font-semibold text-emerald-700 hover:bg-emerald-50">{{ __t('export_excel', 'reports') }}</button>
-                <button type="button" wire:click="exportPdf" wire:loading.class="pointer-events-none opacity-50" wire:target="exportPdf" class="inline-flex h-10 items-center rounded-xl border border-red-300 bg-white px-4 text-sm font-semibold text-red-700 hover:bg-red-50">{{ __t('export_pdf', 'reports') }}</button>
+                <button type="button" wire:click="exportExcel" class="inline-flex h-10 items-center rounded-xl border border-emerald-700 bg-emerald-700 px-4 text-sm font-semibold text-white hover:bg-emerald-800">{{ __t('export_excel', 'reports') }}</button>
+                <button type="button" wire:click="exportPdf" class="inline-flex h-10 items-center rounded-xl border border-red-700 bg-red-700 px-4 text-sm font-semibold text-white hover:bg-red-800">{{ __t('export_pdf', 'reports') }}</button>
             </x-slot:actions>
         </x-page-header>
     </x-slot>
