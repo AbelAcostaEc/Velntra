@@ -27,10 +27,11 @@ class ReportService
      */
     public function salesQuery(string $dateFrom, string $dateTo): Builder
     {
-        return Sale::query()
+        $query = Sale::query()
             ->completed()
-            ->with(['customer', 'user'])
-            ->whereBetween('created_at', $this->dateBounds($dateFrom, $dateTo))
+            ->with(['customer', 'user']);
+
+        return $this->applyDateRange($query, $dateFrom, $dateTo)
             ->latest('created_at')
             ->latest('id');
     }
@@ -40,9 +41,7 @@ class ReportService
      */
     public function salesSummary(string $dateFrom, string $dateTo): array
     {
-        $query = Sale::query()
-            ->completed()
-            ->whereBetween('created_at', $this->dateBounds($dateFrom, $dateTo));
+        $query = $this->applyDateRange(Sale::query()->completed(), $dateFrom, $dateTo);
         $count = (clone $query)->count();
         $total = (float) (clone $query)->sum('total');
 
@@ -90,6 +89,11 @@ class ReportService
     public function customersQuery(string $dateFrom, string $dateTo, string $search = ''): Builder
     {
         $bounds = $this->dateBounds($dateFrom, $dateTo);
+
+        if ($bounds === null) {
+            return Customer::query()->whereRaw('1 = 0');
+        }
+
         $completedSales = fn (Builder $query) => $query
             ->completed()
             ->whereBetween('created_at', $bounds);
@@ -118,14 +122,37 @@ class ReportService
         ];
     }
 
-    /**
-     * @return array{0: CarbonImmutable, 1: CarbonImmutable}
-     */
-    private function dateBounds(string $dateFrom, string $dateTo): array
+    public function hasValidDateRange(string $dateFrom, string $dateTo): bool
     {
-        return [
-            CarbonImmutable::parse($dateFrom)->startOfDay(),
-            CarbonImmutable::parse($dateTo)->endOfDay(),
-        ];
+        return $this->dateBounds($dateFrom, $dateTo) !== null;
+    }
+
+    /** @param Builder<Sale> $query
+     * @return Builder<Sale>
+     */
+    private function applyDateRange(Builder $query, string $dateFrom, string $dateTo): Builder
+    {
+        $bounds = $this->dateBounds($dateFrom, $dateTo);
+
+        return $bounds === null
+            ? $query->whereRaw('1 = 0')
+            : $query->whereBetween('created_at', $bounds);
+    }
+
+    /** @return array{0: CarbonImmutable, 1: CarbonImmutable}|null */
+    private function dateBounds(string $dateFrom, string $dateTo): ?array
+    {
+        try {
+            $start = CarbonImmutable::createFromFormat('!Y-m-d', $dateFrom);
+            $end = CarbonImmutable::createFromFormat('!Y-m-d', $dateTo);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if ($start === null || $end === null || $start->format('Y-m-d') !== $dateFrom || $end->format('Y-m-d') !== $dateTo || $start->isAfter($end)) {
+            return null;
+        }
+
+        return [$start->startOfDay(), $end->endOfDay()];
     }
 }

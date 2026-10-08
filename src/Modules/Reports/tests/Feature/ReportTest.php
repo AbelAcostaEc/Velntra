@@ -174,6 +174,40 @@ class ReportTest extends TestCase
             ->assertFileDownloaded('reporte-clientes-2026-01-01-2026-10-07.pdf');
     }
 
+    public function test_exports_with_invalid_dates_download_empty_reports_without_validation_errors(): void
+    {
+        $this->createSale('VTA-INVALID-RANGE', $this->customer, 'completed', 25, 3, now());
+        $this->actingAs($this->authorizedUser);
+
+        Livewire::test(SalesReport::class)
+            ->set('dateFrom', 'invalid-date')
+            ->set('dateTo', '')
+            ->call('exportExcel')
+            ->assertHasNoErrors()
+            ->assertFileDownloaded('reporte-ventas-sin-datos.xlsx');
+
+        Livewire::test(SalesReport::class)
+            ->set('dateFrom', '2026-10-10')
+            ->set('dateTo', '2026-10-01')
+            ->call('exportPdf')
+            ->assertHasNoErrors()
+            ->assertFileDownloaded('reporte-ventas-sin-datos.pdf');
+
+        Livewire::test(CustomerReport::class)
+            ->set('dateFrom', 'invalid-date')
+            ->set('dateTo', '')
+            ->call('exportExcel')
+            ->assertHasNoErrors()
+            ->assertFileDownloaded('reporte-clientes-sin-datos.xlsx');
+
+        Livewire::test(CustomerReport::class)
+            ->set('dateFrom', '2026-10-10')
+            ->set('dateTo', '2026-10-01')
+            ->call('exportPdf')
+            ->assertHasNoErrors()
+            ->assertFileDownloaded('reporte-clientes-sin-datos.pdf');
+    }
+
     /** @return array<string, mixed> */
     private function productData(string $sku, string $name, int $stock, int $minimumStock, float $price): array
     {

@@ -48,18 +48,18 @@ class CustomerReport extends Component
     public function exportExcel(ReportService $reports): mixed
     {
         Gate::authorize('reports.view');
-        $this->validate($this->dateRules());
+        $period = $this->exportPeriod($reports);
 
         return Excel::download(
             new CustomerReportExport($reports->customersQuery($this->dateFrom, $this->dateTo, $this->search)->get()),
-            "reporte-clientes-{$this->dateFrom}-{$this->dateTo}.xlsx",
+            "reporte-clientes-{$period}.xlsx",
         );
     }
 
     public function exportPdf(ReportService $reports): mixed
     {
         Gate::authorize('reports.view');
-        $this->validate($this->dateRules());
+        $period = $this->exportPeriod($reports);
 
         $pdf = Pdf::loadView('reports::pdf.customers', [
             'customers' => $reports->customersQuery($this->dateFrom, $this->dateTo, $this->search)->get(),
@@ -72,7 +72,7 @@ class CustomerReport extends Component
 
         return response()->streamDownload(
             fn () => print $pdf->output(),
-            "reporte-clientes-{$this->dateFrom}-{$this->dateTo}.pdf",
+            "reporte-clientes-{$period}.pdf",
             ['Content-Type' => 'application/pdf'],
         );
     }
@@ -95,5 +95,12 @@ class CustomerReport extends Component
             'dateFrom' => ['required', 'date'],
             'dateTo' => ['required', 'date', 'after_or_equal:dateFrom'],
         ];
+    }
+
+    private function exportPeriod(ReportService $reports): string
+    {
+        return $reports->hasValidDateRange($this->dateFrom, $this->dateTo)
+            ? "{$this->dateFrom}-{$this->dateTo}"
+            : 'sin-datos';
     }
 }

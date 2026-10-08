@@ -44,18 +44,18 @@ class SalesReport extends Component
     public function exportExcel(ReportService $reports): mixed
     {
         Gate::authorize('reports.view');
-        $this->validate($this->dateRules());
+        $period = $this->exportPeriod($reports);
 
         return Excel::download(
             new SalesReportExport($reports->salesQuery($this->dateFrom, $this->dateTo)->get()),
-            "reporte-ventas-{$this->dateFrom}-{$this->dateTo}.xlsx",
+            "reporte-ventas-{$period}.xlsx",
         );
     }
 
     public function exportPdf(ReportService $reports): mixed
     {
         Gate::authorize('reports.view');
-        $this->validate($this->dateRules());
+        $period = $this->exportPeriod($reports);
 
         $pdf = Pdf::loadView('reports::pdf.sales', [
             'sales' => $reports->salesQuery($this->dateFrom, $this->dateTo)->get(),
@@ -68,7 +68,7 @@ class SalesReport extends Component
 
         return response()->streamDownload(
             fn () => print $pdf->output(),
-            "reporte-ventas-{$this->dateFrom}-{$this->dateTo}.pdf",
+            "reporte-ventas-{$period}.pdf",
             ['Content-Type' => 'application/pdf'],
         );
     }
@@ -91,5 +91,12 @@ class SalesReport extends Component
             'dateFrom' => ['required', 'date'],
             'dateTo' => ['required', 'date', 'after_or_equal:dateFrom'],
         ];
+    }
+
+    private function exportPeriod(ReportService $reports): string
+    {
+        return $reports->hasValidDateRange($this->dateFrom, $this->dateTo)
+            ? "{$this->dateFrom}-{$this->dateTo}"
+            : 'sin-datos';
     }
 }

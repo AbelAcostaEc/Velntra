@@ -78,7 +78,7 @@ está casi completo.
 ## Verificación técnica ejecutada
 
 - Contenedores `app`, `mysql`, `nginx` y `node`: activos; MySQL saludable.
-- Suite unificada: 154 pruebas y 504 aserciones aprobadas.
+- Suite unificada: 155 pruebas y 512 aserciones aprobadas.
 - Build Vite de producción: aprobado.
 - Las 17 migraciones aparecen aplicadas.
 - Laravel registró correctamente 78 rutas de aplicación.
