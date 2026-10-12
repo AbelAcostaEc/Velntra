@@ -3,6 +3,8 @@
 namespace Modules\Reports\Tests\Feature;
 
 use Carbon\CarbonImmutable;
+use DOMDocument;
+use DOMXPath;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Modules\Administration\Models\User;
@@ -118,6 +120,24 @@ class ReportTest extends TestCase
         $this->get(route('reports.sales'))->assertOk()->assertSeeLivewire(SalesReport::class);
         $this->get(route('reports.inventory'))->assertOk()->assertSeeLivewire(InventoryReport::class);
         $this->get(route('reports.customers'))->assertOk()->assertSeeLivewire(CustomerReport::class);
+    }
+
+    public function test_export_buttons_render_inside_their_livewire_component(): void
+    {
+        $this->actingAs($this->authorizedUser);
+
+        foreach (['reports.sales', 'reports.inventory', 'reports.customers'] as $routeName) {
+            $document = new DOMDocument;
+            @$document->loadHTML($this->get(route($routeName))->assertOk()->getContent());
+            $xpath = new DOMXPath($document);
+
+            foreach (['exportExcel', 'exportPdf'] as $action) {
+                $buttons = $xpath->query('//button[@*[name()="wire:click" and .="'.$action.'"]]');
+
+                $this->assertCount(1, $buttons, "{$routeName}: falta el botón {$action}.");
+                $this->assertCount(1, $xpath->query('ancestor::*[@*[name()="wire:id"]]', $buttons->item(0)), "{$routeName}: {$action} está fuera de Livewire.");
+            }
+        }
     }
 
     public function test_report_components_reject_unauthorized_users(): void

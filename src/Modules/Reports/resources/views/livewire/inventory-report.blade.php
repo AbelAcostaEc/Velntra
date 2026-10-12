@@ -1,5 +1,12 @@
 <div>
-    <x-slot name="header"><x-page-header :title="__t('inventory_report', 'reports')" :description="__t('inventory_description', 'reports')"><x-slot:actions><button type="button" wire:click="exportExcel" class="inline-flex h-10 items-center rounded-xl border border-emerald-700 bg-emerald-700 px-4 text-sm font-semibold text-white hover:bg-emerald-800">{{ __t('export_excel', 'reports') }}</button><button type="button" wire:click="exportPdf" class="inline-flex h-10 items-center rounded-xl border border-red-700 bg-red-700 px-4 text-sm font-semibold text-white hover:bg-red-800">{{ __t('export_pdf', 'reports') }}</button></x-slot:actions></x-page-header></x-slot>
+    <div class="mb-6">
+        <x-page-header :title="__t('inventory_report', 'reports')" :description="__t('inventory_description', 'reports')">
+            <x-slot:actions>
+                <button type="button" wire:click="exportExcel" wire:loading.attr="disabled" wire:target="exportExcel" class="inline-flex h-10 items-center rounded-xl border border-emerald-700 bg-emerald-700 px-4 text-sm font-semibold text-white hover:bg-emerald-800 disabled:cursor-wait disabled:opacity-50">{{ __t('export_excel', 'reports') }}</button>
+                <button type="button" wire:click="exportPdf" wire:loading.attr="disabled" wire:target="exportPdf" class="inline-flex h-10 items-center rounded-xl border border-red-700 bg-red-700 px-4 text-sm font-semibold text-white hover:bg-red-800 disabled:cursor-wait disabled:opacity-50">{{ __t('export_pdf', 'reports') }}</button>
+            </x-slot:actions>
+        </x-page-header>
+    </div>
     <div class="space-y-6">
         <x-card>
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1fr_14rem_auto] lg:items-end">
