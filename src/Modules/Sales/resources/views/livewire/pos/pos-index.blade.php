@@ -129,7 +129,7 @@
 
                             <div class="mt-2 flex items-center justify-between border-t border-primary-100 pt-2">
                                 <span class="text-sm font-bold text-primary-950">
-                                    ${{ number_format($prod->price, 2) }}
+                                    {{ $currencySymbol }}{{ number_format($prod->price, 2) }}
                                 </span>
                                 <span class="flex h-6 w-6 items-center justify-center rounded-lg bg-brand-50 text-brand-600 group-hover:bg-brand-600 group-hover:text-white transition-colors">
                                     <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -245,7 +245,7 @@
                                         {{ $item['name'] }}
                                     </h4>
                                     <p class="text-[10px] text-primary-500">
-                                        ${{ number_format($item['price'], 2) }} c/u
+                                        {{ $currencySymbol }}{{ number_format($item['price'], 2) }} c/u
                                     </p>
                                 </div>
 
@@ -271,7 +271,7 @@
                                 {{-- Subtotal del ítem y botón de borrar --}}
                                 <div class="flex items-center gap-2 text-right">
                                     <span class="font-mono text-xs font-bold text-primary-950">
-                                        ${{ number_format($item['subtotal'], 2) }}
+                                        {{ $currencySymbol }}{{ number_format($item['subtotal'], 2) }}
                                     </span>
                                     <button
                                         type="button"
@@ -298,7 +298,7 @@
                     <div class="border-t border-primary-100 pt-3 space-y-2">
                         <div class="flex items-center justify-between text-xs text-primary-600">
                             <span>{{ __t('subtotal', 'sales') }}</span>
-                            <span class="font-mono font-medium">${{ number_format($totals['subtotal'], 2) }}</span>
+                            <span class="font-mono font-medium">{{ $currencySymbol }}{{ number_format($totals['subtotal'], 2) }}</span>
                         </div>
 
                         <div class="flex items-center justify-between text-xs text-primary-600">
@@ -312,18 +312,18 @@
                                     class="w-16 rounded border border-primary-200 px-1.5 py-0.5 text-right text-xs text-primary-900 focus:outline-none focus:ring-1 focus:ring-brand-500"
                                 />
                             </span>
-                            <span class="font-mono font-medium text-rose-600">-${{ number_format($totals['discount'], 2) }}</span>
+                            <span class="font-mono font-medium text-rose-600">-{{ $currencySymbol }}{{ number_format($totals['discount'], 2) }}</span>
                         </div>
 
                         <div class="flex items-center justify-between text-xs text-primary-600">
                             <span>{{ __t('tax', 'sales') }} ({{ $totals['tax_percentage'] }}%)</span>
-                            <span class="font-mono font-medium">${{ number_format($totals['tax'], 2) }}</span>
+                            <span class="font-mono font-medium">{{ $currencySymbol }}{{ number_format($totals['tax'], 2) }}</span>
                         </div>
 
                         <div class="flex items-center justify-between border-t border-primary-200 pt-2">
                             <span class="text-sm font-bold text-primary-900">{{ __t('total', 'sales') }}</span>
                             <span class="font-mono text-xl font-black text-brand-600">
-                                ${{ number_format($totals['total'], 2) }}
+                                {{ $currencySymbol }}{{ number_format($totals['total'], 2) }}
                             </span>
                         </div>
 
@@ -416,7 +416,7 @@
                                 @endif
                             </td>
                             <td class="px-4 py-4 text-right font-mono text-sm font-bold text-primary-950">
-                                ${{ number_format($sale->total, 2) }}
+                                {{ $currencySymbol }}{{ number_format($sale->total, 2) }}
                             </td>
                             <td class="px-4 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
@@ -468,7 +468,7 @@
             <div class="flex flex-col items-center justify-center rounded-2xl bg-brand-50/80 p-5 border border-brand-200">
                 <span class="text-xs uppercase font-bold tracking-wider text-brand-700">{{ __t('total', 'sales') }}</span>
                 <span class="font-mono text-3xl font-black text-brand-950 mt-1">
-                    ${{ number_format($totals['total'], 2) }}
+                    {{ $currencySymbol }}{{ number_format($totals['total'], 2) }}
                 </span>
             </div>
 
@@ -514,7 +514,7 @@
                                     type="button"
                                     wire:click="setQuickAmount({{ $bill }})"
                                     class="rounded-lg border border-primary-200 bg-white px-2.5 py-1 text-xs font-bold text-primary-800 hover:bg-primary-50">
-                                    ${{ $bill }}
+                                    {{ $currencySymbol }}{{ $bill }}
                                 </button>
                             @endif
                         @endforeach
@@ -524,7 +524,7 @@
                     <div class="flex items-center justify-between rounded-xl bg-emerald-50 p-3 border border-emerald-200">
                         <span class="text-xs font-bold text-emerald-900">{{ __t('change', 'sales') }}:</span>
                         <span class="font-mono text-lg font-black text-emerald-950">
-                            ${{ number_format(max(0.00, ((float)$amountPaid) - $totals['total']), 2) }}
+                            {{ $currencySymbol }}{{ number_format(max(0.00, ((float)$amountPaid) - $totals['total']), 2) }}
                         </span>
                     </div>
                 </div>
@@ -573,7 +573,7 @@
 
                     <div class="flex items-center gap-3">
                         <span class="font-mono text-base font-black text-primary-950">
-                            ${{ number_format($held->total, 2) }}
+                            {{ $currencySymbol }}{{ number_format($held->total, 2) }}
                         </span>
 
                         <x-button
@@ -658,7 +658,7 @@
                                 <tr>
                                     <td class="py-1">{{ $it->quantity }}x</td>
                                     <td class="py-1 truncate max-w-[140px]">{{ $it->product->name }}</td>
-                                    <td class="py-1 text-right font-bold">${{ number_format($it->subtotal, 2) }}</td>
+                                    <td class="py-1 text-right font-bold">{{ $currencySymbol }}{{ number_format($it->subtotal, 2) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -668,30 +668,30 @@
                     <div class="border-t border-primary-200 pt-2 space-y-1 text-right text-[11px]">
                         <div class="flex justify-between">
                             <span>Subtotal:</span>
-                            <span>${{ number_format($completedSale->subtotal, 2) }}</span>
+                            <span>{{ $currencySymbol }}{{ number_format($completedSale->subtotal, 2) }}</span>
                         </div>
                         @if ($completedSale->discount > 0)
                             <div class="flex justify-between text-rose-600">
                                 <span>Descuento:</span>
-                                <span>-${{ number_format($completedSale->discount, 2) }}</span>
+                                <span>-{{ $currencySymbol }}{{ number_format($completedSale->discount, 2) }}</span>
                             </div>
                         @endif
                         <div class="flex justify-between">
                             <span>IVA ({{ $completedSale->tax_percentage }}%):</span>
-                            <span>${{ number_format($completedSale->tax, 2) }}</span>
+                            <span>{{ $currencySymbol }}{{ number_format($completedSale->tax, 2) }}</span>
                         </div>
                         <div class="flex justify-between font-bold text-sm border-t border-primary-300 pt-1">
                             <span>TOTAL:</span>
-                            <span>${{ number_format($completedSale->total, 2) }}</span>
+                            <span>{{ $currencySymbol }}{{ number_format($completedSale->total, 2) }}</span>
                         </div>
                         <div class="flex justify-between text-[10px] text-primary-500 pt-1">
                             <span>Pago ({{ ucfirst($completedSale->payment_method) }}):</span>
-                            <span>${{ number_format($completedSale->amount_paid ?: $completedSale->total, 2) }}</span>
+                            <span>{{ $currencySymbol }}{{ number_format($completedSale->amount_paid ?: $completedSale->total, 2) }}</span>
                         </div>
                         @if ($completedSale->change > 0)
                             <div class="flex justify-between text-[10px] text-emerald-700 font-bold">
                                 <span>Cambio:</span>
-                                <span>${{ number_format($completedSale->change, 2) }}</span>
+                                <span>{{ $currencySymbol }}{{ number_format($completedSale->change, 2) }}</span>
                             </div>
                         @endif
                     </div>

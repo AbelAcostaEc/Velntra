@@ -11,6 +11,8 @@ use Modules\Inventory\Livewire\Products\ProductIndex;
 use Modules\Inventory\Models\Category;
 use Modules\Inventory\Models\Product;
 use Modules\Inventory\Services\ProductService;
+use Modules\Settings\Models\Currency;
+use Modules\Settings\Models\Setting;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -211,6 +213,26 @@ class ProductManagementTest extends TestCase
         $response->assertOk()
             ->assertSee('Render Product')
             ->assertSee('PROD-RENDER');
+    }
+
+    public function test_product_list_uses_the_configured_currency_symbol(): void
+    {
+        $currency = Currency::firstOrCreate(['code' => 'EUR'], ['name' => 'Euro', 'symbol' => '€', 'is_active' => true]);
+        Setting::getSettings()->update(['currency_id' => $currency->id]);
+        Product::create([
+            'sku' => 'CURRENCY-TEST',
+            'name' => 'Currency Product',
+            'cost' => 2.00,
+            'price' => 4.00,
+            'stock' => 5,
+            'minimum_stock' => 1,
+            'is_active' => true,
+        ]);
+        $this->actingAs($this->adminUser);
+
+        Livewire::test(ProductIndex::class)
+            ->assertSee('€4.00')
+            ->assertSee('€2.00');
     }
 
     public function test_product_index_component_denies_access_to_unauthorized_user(): void

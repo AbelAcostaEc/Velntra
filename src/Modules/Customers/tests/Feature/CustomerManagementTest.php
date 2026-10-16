@@ -12,6 +12,8 @@ use Modules\Customers\Livewire\Customers\CustomerPurchaseHistory;
 use Modules\Customers\Models\Customer;
 use Modules\Customers\Services\CustomerService;
 use Modules\Sales\Models\Sale;
+use Modules\Settings\Models\Currency;
+use Modules\Settings\Models\Setting;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -387,6 +389,26 @@ class CustomerManagementTest extends TestCase
                     && $stats['total_purchases'] === 2
                     && $stats['average_ticket'] == 100.00;
             });
+    }
+
+    public function test_customer_purchase_history_uses_the_configured_currency_symbol(): void
+    {
+        $currency = Currency::firstOrCreate(['code' => 'EUR'], ['name' => 'Euro', 'symbol' => '€', 'is_active' => true]);
+        Setting::getSettings()->update(['currency_id' => $currency->id]);
+        $customer = Customer::create(['name' => 'Currency Customer', 'is_active' => true]);
+        Sale::create([
+            'number' => 'VTA-CURRENCY-001',
+            'customer_id' => $customer->id,
+            'user_id' => $this->adminUser->id,
+            'subtotal' => 10.00,
+            'tax' => 0.00,
+            'total' => 10.00,
+            'status' => 'completed',
+        ]);
+        $this->actingAs($this->adminUser);
+
+        Livewire::test(CustomerPurchaseHistory::class, ['customer' => $customer])
+            ->assertSee('€10.00');
     }
 
     public function test_customer_purchase_history_filters_by_search_and_status(): void

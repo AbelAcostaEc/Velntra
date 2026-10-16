@@ -15,6 +15,7 @@ use Modules\Reports\Livewire\InventoryReport;
 use Modules\Reports\Livewire\SalesReport;
 use Modules\Reports\Services\ReportService;
 use Modules\Sales\Models\Sale;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
@@ -175,23 +176,73 @@ class ReportTest extends TestCase
         Livewire::test(SalesReport::class)
             ->call('exportExcel')
             ->assertFileDownloaded('reporte-ventas-2026-10-01-2026-10-07.xlsx');
-        Livewire::test(SalesReport::class)
+        $salesPdf = Livewire::test(SalesReport::class)
             ->call('exportPdf')
             ->assertFileDownloaded('reporte-ventas-2026-10-01-2026-10-07.pdf');
+        $this->assertPdfDownload($salesPdf->effects);
 
         Livewire::test(InventoryReport::class)
             ->call('exportExcel')
             ->assertFileDownloaded('reporte-inventario-2026-10-07.xlsx');
-        Livewire::test(InventoryReport::class)
+        $inventoryPdf = Livewire::test(InventoryReport::class)
             ->call('exportPdf')
             ->assertFileDownloaded('reporte-inventario-2026-10-07.pdf');
+        $this->assertPdfDownload($inventoryPdf->effects);
 
         Livewire::test(CustomerReport::class)
             ->call('exportExcel')
             ->assertFileDownloaded('reporte-clientes-2026-01-01-2026-10-07.xlsx');
-        Livewire::test(CustomerReport::class)
+        $customersPdf = Livewire::test(CustomerReport::class)
             ->call('exportPdf')
             ->assertFileDownloaded('reporte-clientes-2026-01-01-2026-10-07.pdf');
+        $this->assertPdfDownload($customersPdf->effects);
+    }
+
+    public function test_excel_exports_contain_only_the_filtered_data_and_correct_values(): void
+    {
+        $otherCustomer = Customer::create([
+            'name' => 'Other Customer',
+            'document' => 'REPORT-002',
+            'is_active' => true,
+        ]);
+        $this->createSale('VTA-IN-RANGE', $this->customer, 'completed', 115, 15, now());
+        $this->createSale('VTA-CANCELLED', $this->customer, 'cancelled', 230, 30, now());
+        $this->createSale('VTA-OUT-RANGE', $this->customer, 'completed', 60, 0, now()->subMonth());
+        $this->createSale('VTA-OTHER-CUSTOMER', $otherCustomer, 'completed', 40, 0, now());
+        Product::create($this->productData('REPORT-ALPHA', 'Alpha', 5, 2, 4));
+        Product::create($this->productData('REPORT-BETA', 'Beta', 3, 2, 8));
+        $this->actingAs($this->authorizedUser);
+
+        $salesDownload = Livewire::test(SalesReport::class)
+            ->call('exportExcel')
+            ->assertFileDownloaded();
+        $salesRows = $this->excelRows($salesDownload->effects);
+        $this->assertCount(3, $salesRows);
+        $salesByNumber = collect(array_slice($salesRows, 1))->keyBy(0);
+        $this->assertEqualsCanonicalizing(['VTA-IN-RANGE', 'VTA-OTHER-CUSTOMER'], $salesByNumber->keys()->all());
+        $this->assertSame(15.0, $salesByNumber['VTA-IN-RANGE'][7]);
+        $this->assertSame(115.0, $salesByNumber['VTA-IN-RANGE'][8]);
+
+        $inventoryDownload = Livewire::test(InventoryReport::class)
+            ->set('search', 'Alpha')
+            ->call('exportExcel')
+            ->assertFileDownloaded();
+        $inventoryRows = $this->excelRows($inventoryDownload->effects);
+        $this->assertCount(2, $inventoryRows);
+        $this->assertSame('REPORT-ALPHA', $inventoryRows[1][0]);
+        $this->assertSame(5, $inventoryRows[1][3]);
+        $this->assertSame(10.0, $inventoryRows[1][7]);
+        $this->assertSame(20.0, $inventoryRows[1][8]);
+
+        $customerDownload = Livewire::test(CustomerReport::class)
+            ->set('search', 'REPORT-002')
+            ->call('exportExcel')
+            ->assertFileDownloaded();
+        $customerRows = $this->excelRows($customerDownload->effects);
+        $this->assertCount(2, $customerRows);
+        $this->assertSame('Other Customer', $customerRows[1][1]);
+        $this->assertSame(1, $customerRows[1][5]);
+        $this->assertSame(40.0, $customerRows[1][6]);
     }
 
     public function test_exports_with_invalid_dates_download_empty_reports_without_validation_errors(): void
@@ -267,5 +318,32 @@ class ReportTest extends TestCase
         $sale->forceFill(['created_at' => $createdAt, 'updated_at' => $createdAt])->save();
 
         return $sale;
+    }
+
+    /**
+     * @param array<string, mixed> $effects
+     * @return list<list<mixed>>
+     */
+    private function excelRows(array $effects): array
+    {
+        $this->assertStringEndsWith('.xlsx', $effects['download']['name']);
+        $file = tmpfile();
+        $this->assertIsResource($file);
+
+        try {
+            fwrite($file, base64_decode($effects['download']['content'], true));
+            $spreadsheet = IOFactory::load(stream_get_meta_data($file)['uri']);
+
+            return $spreadsheet->getActiveSheet()->toArray(null, true, false);
+        } finally {
+            fclose($file);
+        }
+    }
+
+    /** @param array<string, mixed> $effects */
+    private function assertPdfDownload(array $effects): void
+    {
+        $this->assertSame('application/pdf', $effects['download']['contentType']);
+        $this->assertStringStartsWith('%PDF-', base64_decode($effects['download']['content'], true));
     }
 }

@@ -103,8 +103,8 @@
                             </div>
                         </td>
                         <td class="px-4 py-4 text-sm">
-                            <div class="font-semibold text-primary-950">${{ number_format((float)$product->price, 2) }}</div>
-                            <div class="text-xs text-primary-500">${{ number_format((float)$product->cost, 2) }}</div>
+                            <div class="font-semibold text-primary-950">{{ $currencySymbol }}{{ number_format((float)$product->price, 2) }}</div>
+                            <div class="text-xs text-primary-500">{{ $currencySymbol }}{{ number_format((float)$product->cost, 2) }}</div>
                         </td>
                         <td class="px-4 py-4 text-sm">
                             <div class="flex items-center gap-1.5">

@@ -134,10 +134,11 @@ class CustomerPurchaseHistory extends Component
             : null;
 
         return view('customers::livewire.customers.customer-purchase-history', [
-            'settings'     => $settings,
-            'sales'        => $sales,
-            'selectedSale' => $selectedSale,
-            'stats'        => $this->stats,
+            'settings'       => $settings,
+            'currencySymbol' => $settings->currency?->symbol ?? '$',
+            'sales'          => $sales,
+            'selectedSale'   => $selectedSale,
+            'stats'          => $this->stats,
         ]);
     }
 }

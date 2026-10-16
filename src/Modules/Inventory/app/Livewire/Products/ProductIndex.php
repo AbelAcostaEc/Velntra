@@ -13,6 +13,7 @@ use Livewire\WithPagination;
 use Modules\Inventory\Models\Category;
 use Modules\Inventory\Models\Product;
 use Modules\Inventory\Services\ProductService;
+use Modules\Settings\Models\Setting;
 
 #[Layout('layouts.app')]
 class ProductIndex extends Component
@@ -372,6 +373,7 @@ class ProductIndex extends Component
 
         return view('inventory::livewire.products.product-index', [
             'products'         => $products,
+            'currencySymbol'   => Setting::getSettings()->currency?->symbol ?? '$',
             'totalProducts'    => $totalProducts,
             'activeProducts'   => $activeProducts,
             'lowStockProducts' => $lowStockProducts,

@@ -378,6 +378,18 @@ class SaleManagementTest extends TestCase
             ->assertSee($this->customer->name);
     }
 
+    public function test_pos_uses_the_configured_currency_symbol(): void
+    {
+        $currency = Currency::firstOrCreate(['code' => 'EUR'], ['name' => 'Euro', 'symbol' => '€', 'is_active' => true]);
+        Setting::getSettings()->update(['currency_id' => $currency->id]);
+        $this->actingAs($this->adminUser);
+
+        Livewire::test(PosIndex::class)
+            ->assertSee('€2.50')
+            ->call('addToCart', $this->productA->id)
+            ->assertSee('€2.50');
+    }
+
     public function test_pos_index_component_denies_access_to_unauthorized_user(): void
     {
         $this->actingAs($this->unauthorizedUser);

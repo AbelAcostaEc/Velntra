@@ -730,6 +730,7 @@ class PosIndex extends Component
 
         return view('sales::livewire.pos.pos-index', [
             'settings'          => $settings,
+            'currencySymbol'    => $settings->currency?->symbol ?? '$',
             'categories'        => $categories,
             'products'          => $products,
             'customersList'     => $customersList,

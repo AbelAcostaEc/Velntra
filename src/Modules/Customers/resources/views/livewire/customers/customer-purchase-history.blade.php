@@ -67,7 +67,7 @@
             </div>
             <div class="mt-2">
                 <span class="font-mono text-2xl font-black text-primary-950">
-                    ${{ number_format($stats['total_spent'], 2) }}
+                    {{ $currencySymbol }}{{ number_format($stats['total_spent'], 2) }}
                 </span>
                 <p class="text-[11px] text-primary-400 mt-0.5">{{ __t('completed_sales_only', 'customers') }}</p>
             </div>
@@ -103,7 +103,7 @@
             </div>
             <div class="mt-2">
                 <span class="font-mono text-2xl font-black text-primary-950">
-                    ${{ number_format($stats['average_ticket'], 2) }}
+                    {{ $currencySymbol }}{{ number_format($stats['average_ticket'], 2) }}
                 </span>
                 <p class="text-[11px] text-primary-400 mt-0.5">Promedio por compra</p>
             </div>
@@ -201,7 +201,7 @@
                     @endif
                 </td>
                 <td class="px-4 py-4 text-right font-mono text-sm font-bold text-primary-950">
-                    ${{ number_format($sale->total, 2) }}
+                    {{ $currencySymbol }}{{ number_format($sale->total, 2) }}
                 </td>
                 <td class="px-4 py-4 text-right">
                     <x-button
@@ -279,8 +279,8 @@
                                 <tr>
                                     <td class="py-1">{{ $it->quantity }}x</td>
                                     <td class="py-1 truncate max-w-[140px]">{{ $it->product->name }}</td>
-                                    <td class="py-1 text-right">${{ number_format($it->price, 2) }}</td>
-                                    <td class="py-1 text-right font-bold">${{ number_format($it->subtotal, 2) }}</td>
+                                    <td class="py-1 text-right">{{ $currencySymbol }}{{ number_format($it->price, 2) }}</td>
+                                    <td class="py-1 text-right font-bold">{{ $currencySymbol }}{{ number_format($it->subtotal, 2) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -290,30 +290,30 @@
                     <div class="border-t border-primary-200 pt-2 space-y-1 text-right text-[11px]">
                         <div class="flex justify-between">
                             <span>Subtotal:</span>
-                            <span>${{ number_format($selectedSale->subtotal, 2) }}</span>
+                            <span>{{ $currencySymbol }}{{ number_format($selectedSale->subtotal, 2) }}</span>
                         </div>
                         @if ($selectedSale->discount > 0)
                             <div class="flex justify-between text-rose-600">
                                 <span>Descuento:</span>
-                                <span>-${{ number_format($selectedSale->discount, 2) }}</span>
+                                <span>-{{ $currencySymbol }}{{ number_format($selectedSale->discount, 2) }}</span>
                             </div>
                         @endif
                         <div class="flex justify-between">
                             <span>IVA ({{ $selectedSale->tax_percentage }}%):</span>
-                            <span>${{ number_format($selectedSale->tax, 2) }}</span>
+                            <span>{{ $currencySymbol }}{{ number_format($selectedSale->tax, 2) }}</span>
                         </div>
                         <div class="flex justify-between font-bold text-sm border-t border-primary-300 pt-1">
                             <span>TOTAL:</span>
-                            <span>${{ number_format($selectedSale->total, 2) }}</span>
+                            <span>{{ $currencySymbol }}{{ number_format($selectedSale->total, 2) }}</span>
                         </div>
                         <div class="flex justify-between text-[10px] text-primary-500 pt-1">
                             <span>Pago ({{ ucfirst($selectedSale->payment_method) }}):</span>
-                            <span>${{ number_format($selectedSale->amount_paid ?: $selectedSale->total, 2) }}</span>
+                            <span>{{ $currencySymbol }}{{ number_format($selectedSale->amount_paid ?: $selectedSale->total, 2) }}</span>
                         </div>
                         @if ($selectedSale->change > 0)
                             <div class="flex justify-between text-[10px] text-emerald-700 font-bold">
                                 <span>Cambio:</span>
-                                <span>${{ number_format($selectedSale->change, 2) }}</span>
+                                <span>{{ $currencySymbol }}{{ number_format($selectedSale->change, 2) }}</span>
                             </div>
                         @endif
                     </div>
