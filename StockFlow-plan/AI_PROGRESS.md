@@ -27,7 +27,7 @@ POS, catálogo, historial, dashboard y reportes.
 | 06 - Dashboard | 100 % | Métricas reales, últimas ventas, stock bajo, gráfico con períodos predefinidos y rango personalizado, accesos rápidos, permisos y diseño responsive implementados y probados. |
 | 07 - Reportes | 100 % | Reportes independientes de ventas, inventario y clientes con filtros, métricas, paginación, permisos y exportación Excel/PDF. Las pruebas leen el contenido Excel y verifican los PDF. Las filas se presentan como tarjetas en móvil y tablas en escritorio. |
 | 08 - Configuración | 100 % | Empresa, moneda, IVA y logo implementados. El IVA se usa en ventas y el símbolo de moneda configurado aparece en las vistas monetarias del MVP. |
-| 09 - Calidad | 70 % | La suite y el build pasan. Hay prueba integral automatizada y permisos reforzados. El usuario confirmó las tarjetas de Reportes en responsive, además de la creación de producto y una venta completa con descuento correcto de stock. Faltan revisar POS en móvil, abrir visualmente PDF/Excel y confirmar manualmente la anulación con restitución de stock en este recorrido. |
+| 09 - Calidad | 75 % | La suite y el build pasan. Hay prueba integral automatizada y permisos reforzados. El usuario confirmó las tarjetas de Reportes en responsive, la venta con descuento de stock y la anulación con restitución de stock en escritorio. El historial de ventas ya tiene tarjetas y acciones móviles cubiertas por prueba automatizada; falta revalidarlo visualmente, revisar el resto del POS en móvil y abrir visualmente PDF/Excel. |
 | 10 - Publicación | 5 % | Pendientes README, guía final, capturas, demo y despliegue. |
 
 ## Decisiones arquitectónicas aprobadas
@@ -65,7 +65,8 @@ POS, catálogo, historial, dashboard y reportes.
 - Inventario incluye categorías, productos, imágenes, filtros, búsqueda y stock.
 - Clientes incluye Consumidor Final, CRUD e historial de compras.
 - Ventas incluye POS, carrito, ventas pendientes, cobro, descuento de stock y
-  anulación con restauración de stock.
+  anulación con restauración de stock. El historial usa tarjetas con acciones
+  en móvil y conserva la tabla en escritorio.
 - Dashboard incluye ventas del día y del mes, productos y clientes activos,
   últimas ventas, alertas de stock bajo y evolución por últimos siete días, mes
   actual, mes anterior o un rango personalizado de hasta 93 días.
@@ -88,13 +89,15 @@ POS, catálogo, historial, dashboard y reportes.
 ## Verificación técnica ejecutada
 
 - Contenedores `app`, `mysql`, `nginx` y `node`: activos; MySQL saludable.
-- Suite unificada: 165 pruebas y 625 aserciones aprobadas (2026-10-16).
+- Suite unificada: 166 pruebas y 635 aserciones aprobadas (2026-10-16).
 - Build Vite de producción: aprobado.
 - Validación manual comunicada por el usuario (2026-10-16): confirmó las
   tarjetas de Reportes en responsive, creó los datos necesarios y completó
-  una venta desde cero; el stock se descontó correctamente. No incluye aún
-  confirmación de apertura visual de PDF/Excel, del POS en móvil ni de la
-  anulación con restitución de stock en este recorrido.
+  una venta desde cero; el stock se descontó correctamente. También anuló
+  la venta en escritorio y comprobó que el stock se restauró. Detectó que el
+  historial y sus acciones no se veían en móvil; se añadieron tarjetas y una
+  prueba automatizada, pendiente de revalidación visual. Aún faltan confirmar
+  la apertura visual de PDF/Excel y el resto del POS en móvil.
 - Las 17 migraciones aparecen aplicadas.
 - Laravel registró correctamente 78 rutas de aplicación.
 - El contenedor `app` ejecuta migraciones y seeders estructurales al arrancar;

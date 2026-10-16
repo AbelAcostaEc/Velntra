@@ -2,6 +2,8 @@
 
 namespace Modules\Sales\Tests\Feature;
 
+use DOMDocument;
+use DOMXPath;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
 use Livewire\Livewire;
@@ -536,6 +538,51 @@ class SaleManagementTest extends TestCase
 
         $this->assertEquals('cancelled', $sale->fresh()->status);
         $this->assertEquals(20, $this->productA->fresh()->stock); // Stock restored
+    }
+
+    public function test_mobile_sales_history_shows_records_and_authorized_actions(): void
+    {
+        $service = app(SaleService::class);
+        $completed = $service->createSale([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->adminUser->id,
+            'status' => 'completed',
+        ], [
+            ['product_id' => $this->productA->id, 'quantity' => 2],
+        ]);
+        $pending = $service->createSale([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->adminUser->id,
+            'status' => 'pending',
+        ], [
+            ['product_id' => $this->productB->id, 'quantity' => 1],
+        ]);
+
+        $this->actingAs($this->adminUser);
+        $document = new DOMDocument;
+        @$document->loadHTML(Livewire::test(PosIndex::class)->set('activeTab', 'history')->html());
+        $xpath = new DOMXPath($document);
+
+        $completedCards = $xpath->query('//article[@data-sale-history-mobile-card="'.$completed->id.'"]');
+        $pendingCards = $xpath->query('//article[@data-sale-history-mobile-card="'.$pending->id.'"]');
+
+        $this->assertCount(1, $completedCards);
+        $this->assertCount(1, $pendingCards);
+        $this->assertStringContainsString($completed->number, $completedCards->item(0)->textContent);
+        $this->assertStringContainsString($this->customer->name, $completedCards->item(0)->textContent);
+        $this->assertCount(1, $xpath->query('ancestor::div[contains(concat(" ", normalize-space(@class), " "), " md:hidden ")]', $completedCards->item(0)));
+        $this->assertCount(1, $xpath->query('.//button[@*[name()="wire:click" and .="openCancelModal('.$completed->id.')"]]', $completedCards->item(0)));
+        $this->assertCount(1, $xpath->query('.//button[@*[name()="wire:click" and contains(., "completedSaleId")]]', $completedCards->item(0)));
+        $this->assertCount(0, $xpath->query('.//button[@*[name()="wire:click" and contains(., "openCancelModal")]]', $pendingCards->item(0)));
+
+        $this->actingAs($this->viewOnlyUser);
+        $viewerDocument = new DOMDocument;
+        @$viewerDocument->loadHTML(Livewire::test(PosIndex::class)->set('activeTab', 'history')->html());
+        $viewerXPath = new DOMXPath($viewerDocument);
+        $viewerCards = $viewerXPath->query('//article[@data-sale-history-mobile-card="'.$completed->id.'"]');
+
+        $this->assertCount(1, $viewerCards);
+        $this->assertCount(0, $viewerXPath->query('.//button[@*[name()="wire:click" and .="openCancelModal('.$completed->id.')"]]', $viewerCards->item(0)));
     }
 
     public function test_pos_index_can_edit_customer_directly_from_pos(): void

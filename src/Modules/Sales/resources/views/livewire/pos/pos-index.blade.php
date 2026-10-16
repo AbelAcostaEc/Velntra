@@ -452,6 +452,62 @@
                     @endforelse
                 @endif
 
+                <x-slot:mobile>
+                    @if ($historySales)
+                        @forelse ($historySales as $sale)
+                            <x-mobile-record-card
+                                data-sale-history-mobile-card="{{ $sale->id }}"
+                                :title="$sale->number"
+                                :subtitle="$sale->created_at->format('d/m/Y H:i')">
+                                <x-slot:status>
+                                    @if ($sale->status === 'completed')
+                                        <x-badge variant="success">{{ __t('status_completed', 'sales') }}</x-badge>
+                                    @elseif ($sale->status === 'pending')
+                                        <x-badge variant="warning">{{ __t('status_pending', 'sales') }}</x-badge>
+                                    @else
+                                        <x-badge variant="danger">{{ __t('status_cancelled', 'sales') }}</x-badge>
+                                    @endif
+                                </x-slot:status>
+                                <x-slot:meta>
+                                    <div class="col-span-2 min-w-0">
+                                        <dt class="text-xs text-primary-500">{{ __t('col_customer', 'sales') }}</dt>
+                                        <dd class="mt-1 break-words font-medium text-primary-900">{{ $sale->customer->name }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt class="text-xs text-primary-500">{{ __t('col_payment', 'sales') }}</dt>
+                                        <dd class="mt-1 font-medium capitalize text-primary-900">{{ $sale->payment_method }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt class="text-xs text-primary-500">{{ __t('col_total', 'sales') }}</dt>
+                                        <dd class="mt-1 font-semibold text-primary-950">{{ $currencySymbol }}{{ number_format($sale->total, 2) }}</dd>
+                                    </div>
+                                </x-slot:meta>
+                                <x-slot:actions>
+                                    <x-button
+                                        variant="secondary"
+                                        size="sm"
+                                        wire:click="$set('completedSaleId', {{ $sale->id }})"
+                                        x-on:click="$dispatch('open-modal', 'receipt-modal')">
+                                        Ticket
+                                    </x-button>
+                                    @can('cancel', $sale)
+                                        <x-button
+                                            variant="danger"
+                                            size="sm"
+                                            wire:click="openCancelModal({{ $sale->id }})">
+                                            {{ __t('cancel_sale', 'sales') }}
+                                        </x-button>
+                                    @endcan
+                                </x-slot:actions>
+                            </x-mobile-record-card>
+                        @empty
+                            <x-empty-state
+                                :title="__t('no_sales_title', 'sales')"
+                                :description="__t('no_sales_description', 'sales')" />
+                        @endforelse
+                    @endif
+                </x-slot:mobile>
+
                 <x-slot:pagination>
                     @if ($historySales)
                         <div class="px-4 py-3">
