@@ -2,7 +2,7 @@
 
 ## Estado actual
 
-Sprint actual: Sprint 09 - Calidad y pulido.
+Sprint actual: Sprint 10 - Portafolio y publicación.
 
 Estado general: núcleo operativo del MVP implementado. Los Sprints 01 a 04 están
 completos y validados mediante pruebas automatizadas y build en Docker. El
@@ -11,7 +11,10 @@ manual integral previamente realizada. El Sprint 06 ya funciona con datos
 reales y quedó cubierto por pruebas. El Sprint 07 incluye tres componentes de
 reportes independientes, exportaciones verificadas y botones funcionales. El
 Sprint 08 cumple su Definition of Done: la moneda configurada se muestra en
-POS, catálogo, historial, dashboard y reportes.
+POS, catálogo, historial, dashboard y reportes. El Sprint 09 quedó validado
+manualmente por el usuario en desktop y móvil. El Sprint 10 ya tiene README,
+guías, datos demo aislados, capturas reales y texto para portafolio; faltan
+hosting, despliegue y video.
 
 Última actualización: 2026-10-16.
 
@@ -27,8 +30,8 @@ POS, catálogo, historial, dashboard y reportes.
 | 06 - Dashboard | 100 % | Métricas reales, últimas ventas, stock bajo, gráfico con períodos predefinidos y rango personalizado, accesos rápidos, permisos y diseño responsive implementados y probados. |
 | 07 - Reportes | 100 % | Reportes independientes de ventas, inventario y clientes con filtros, métricas, paginación, permisos y exportación Excel/PDF. Las pruebas leen el contenido Excel y verifican los PDF. Las filas se presentan como tarjetas en móvil y tablas en escritorio. |
 | 08 - Configuración | 100 % | Empresa, moneda, IVA y logo implementados. El IVA se usa en ventas y el símbolo de moneda configurado aparece en las vistas monetarias del MVP. |
-| 09 - Calidad | 80 % | La suite y el build pasan. Hay prueba integral automatizada y permisos reforzados. El usuario confirmó Reportes responsive, venta y anulación con stock correcto, además del historial y sus acciones en móvil. Se mejoró el selector Punto de Venta/Historial con colores reales del tema y prueba automatizada; falta revalidarlo visualmente, revisar el resto del POS en móvil y abrir visualmente PDF/Excel. |
-| 10 - Publicación | 5 % | Pendientes README, guía final, capturas, demo y despliegue. |
+| 09 - Calidad | 100 % | La suite y el build pasan. El usuario confirmó reportes y exportaciones Excel/PDF, POS completo en móvil, mensajes y confirmaciones; también venta, anulación y stock correctos, historial móvil y selector de pestañas. |
+| 10 - Publicación | 65 % | README profesional, instalación, guía de despliegue, datos demo opcionales, cinco capturas reales y texto para portafolio listos. Sin hosting aún: pendientes despliegue público, sección en portafolio externo y video final. |
 
 ## Decisiones arquitectónicas aprobadas
 
@@ -54,6 +57,8 @@ POS, catálogo, historial, dashboard y reportes.
   para el entorno de demostración.
 - Se mantienen seeders para datos estructurales del sistema, como permisos,
   roles, administrador, monedas y configuración base.
+- `PortfolioDemoSeeder` es explícito, repetible y está bloqueado en producción;
+  no forma parte de `DatabaseSeeder` ni se ejecuta en un negocio real.
 
 ## Implementación confirmada
 
@@ -89,22 +94,26 @@ POS, catálogo, historial, dashboard y reportes.
 ## Verificación técnica ejecutada
 
 - Contenedores `app`, `mysql`, `nginx` y `node`: activos; MySQL saludable.
-- Suite unificada: 167 pruebas y 653 aserciones aprobadas (2026-10-16).
+- Suite unificada: 171 pruebas y 671 aserciones aprobadas (2026-10-16).
 - Build Vite de producción: aprobado.
+- `composer validate --no-check-publish`: aprobado.
 - Validación manual comunicada por el usuario (2026-10-16): confirmó las
   tarjetas de Reportes en responsive, creó los datos necesarios y completó
   una venta desde cero; el stock se descontó correctamente. También anuló
   la venta en escritorio y comprobó que el stock se restauró. Detectó que el
   historial y sus acciones no se veían en móvil; tras añadir tarjetas, confirmó
-  que ambos se muestran y funcionan. Señaló que el selector de pestañas quedaba
-  visualmente en blanco; se corrigió el color y diseño con prueba automatizada,
-  pendiente de revalidación visual. Aún faltan confirmar la apertura visual de
-  PDF/Excel y el resto del POS en móvil.
+  que ambos se muestran y funcionan. Confirmó también el selector de pestañas,
+  el resto del POS móvil, la apertura de Excel/PDF de los tres reportes y los
+  mensajes de error y confirmaciones.
 - Las 17 migraciones aparecen aplicadas.
 - Laravel registró correctamente 78 rutas de aplicación.
 - El contenedor `app` ejecuta migraciones y seeders estructurales al arrancar;
   después de recrear el volumen quedan disponibles permisos, roles y el
-  administrador inicial.
+  administrador inicial. El seeder ahora incluye monedas/configuración sin
+  sobrescribir cambios previos; evita crear un segundo administrador y exige
+  credenciales nuevas en producción.
+- Capturas del Dashboard, productos, POS, reporte y historial móvil generadas
+  con Chrome sobre un proyecto Docker demo de base MySQL aislada.
 
 `phpunit.xml` incluye la suite base y todos los tests de `Modules/*/tests`, por lo
 que `php artisan test` valida el proyecto completo con un solo comando.
@@ -117,8 +126,9 @@ login -> cliente -> categoría -> producto -> venta -> anulación -> historial
 
 ## Próximas prioridades
 
-1. Completar Sprint 09 - Calidad y pulido.
-2. Preparar Sprint 10 - Publicación y portafolio.
+1. Elegir hosting/dominio y adaptar la guía de despliegue al destino.
+2. Desplegar, verificar HTTPS y respaldos, y enlazar la URL pública.
+3. Publicar la ficha del portafolio y grabar/verificar el video demo.
 
 ## Notas
 
