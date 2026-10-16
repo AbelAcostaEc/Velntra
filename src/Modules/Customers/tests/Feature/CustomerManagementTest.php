@@ -2,6 +2,7 @@
 
 namespace Modules\Customers\Tests\Feature;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
 use Livewire\Livewire;
@@ -447,6 +448,29 @@ class CustomerManagementTest extends TestCase
             ->set('statusFilter', 'pending')
             ->assertSee('VTA-FILTER-002')
             ->assertDontSee('VTA-FILTER-001');
+    }
+
+    public function test_customer_purchase_history_cannot_open_another_customers_receipt(): void
+    {
+        $this->actingAs($this->adminUser);
+        $customer = Customer::create(['name' => 'Visible Customer', 'is_active' => true]);
+        $otherCustomer = Customer::create(['name' => 'Secret Customer', 'is_active' => true]);
+        $otherSale = Sale::create([
+            'number' => 'VTA-SECRET-001',
+            'customer_id' => $otherCustomer->id,
+            'user_id' => $this->adminUser->id,
+            'subtotal' => 10,
+            'total' => 10,
+            'status' => 'completed',
+        ]);
+
+        Livewire::test(CustomerPurchaseHistory::class, ['customer' => $customer])
+            ->set('selectedSaleId', $otherSale->id)
+            ->assertDontSee('VTA-SECRET-001');
+
+        $this->expectException(ModelNotFoundException::class);
+        Livewire::test(CustomerPurchaseHistory::class, ['customer' => $customer])
+            ->call('openReceiptModal', $otherSale->id);
     }
 
     public function test_customer_purchase_history_denies_unauthorized_user(): void

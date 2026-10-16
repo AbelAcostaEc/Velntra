@@ -75,6 +75,7 @@ class CustomerPurchaseHistory extends Component
      */
     public function openReceiptModal(int $saleId): void
     {
+        $this->customer->sales()->findOrFail($saleId);
         $this->selectedSaleId = $saleId;
         $this->dispatch('open-modal', 'customer-receipt-modal');
     }
@@ -130,7 +131,7 @@ class CustomerPurchaseHistory extends Component
         $sales = $salesQuery->latest('id')->paginate($this->perPage);
 
         $selectedSale = $this->selectedSaleId
-            ? Sale::with(['items.product', 'customer', 'user'])->find($this->selectedSaleId)
+            ? $this->customer->sales()->with(['items.product', 'customer', 'user'])->find($this->selectedSaleId)
             : null;
 
         return view('customers::livewire.customers.customer-purchase-history', [

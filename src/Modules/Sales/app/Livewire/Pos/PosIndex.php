@@ -348,6 +348,8 @@ class PosIndex extends Component
      */
     public function createQuickCustomer(CustomerService $customerService): void
     {
+        $this->authorize('create', Customer::class);
+
         $this->validate([
             'newCustomerName'     => ['required', 'string', 'max:255'],
             'newCustomerDocument' => [
@@ -388,6 +390,7 @@ class PosIndex extends Component
         }
 
         $customer = Customer::findOrFail($this->selectedCustomerId);
+        $this->authorize('update', $customer);
 
         $this->editingCustomerId = $customer->id;
         $this->editCustomerName = $customer->name;
@@ -409,6 +412,9 @@ class PosIndex extends Component
             return;
         }
 
+        $customer = $customerService->find($this->editingCustomerId);
+        $this->authorize('update', $customer);
+
         $this->validate([
             'editCustomerName'     => ['required', 'string', 'max:255'],
             'editCustomerDocument' => [
@@ -424,7 +430,6 @@ class PosIndex extends Component
             'editCustomerAddress'  => ['nullable', 'string', 'max:500'],
         ]);
 
-        $customer = $customerService->find($this->editingCustomerId);
         $customerService->update($customer, [
             'name'     => $this->editCustomerName,
             'document' => $this->editCustomerDocument,
@@ -494,6 +499,8 @@ class PosIndex extends Component
     public function resumeHeldSale(int $saleId, SaleService $saleService): void
     {
         $sale = $saleService->find($saleId);
+        $this->authorize('create', Sale::class);
+        $this->authorize('delete', $sale);
 
         if (!$sale->isPending()) {
             $this->dispatch('toast', [
@@ -543,6 +550,7 @@ class PosIndex extends Component
     public function deleteHeldSale(int $saleId, SaleService $saleService): void
     {
         $sale = $saleService->find($saleId);
+        $this->authorize('delete', $sale);
         $saleService->deletePendingSale($sale);
 
         $this->dispatch('toast', [
@@ -731,6 +739,9 @@ class PosIndex extends Component
         return view('sales::livewire.pos.pos-index', [
             'settings'          => $settings,
             'currencySymbol'    => $settings->currency?->symbol ?? '$',
+            'canCreateSale'     => Auth::user()->can('create', Sale::class),
+            'canCreateCustomer' => Auth::user()->can('create', Customer::class),
+            'canUpdateCustomer' => $selectedCustomer && Auth::user()->can('update', $selectedCustomer),
             'categories'        => $categories,
             'products'          => $products,
             'customersList'     => $customersList,

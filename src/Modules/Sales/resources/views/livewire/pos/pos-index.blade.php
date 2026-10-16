@@ -98,7 +98,7 @@
                         <button
                             type="button"
                             wire:click="addToCart({{ $prod->id }})"
-                            @disabled($prod->stock <= 0)
+                            @disabled($prod->stock <= 0 || ! $canCreateSale)
                             class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-primary-200 bg-white p-3 text-left shadow-xs transition hover:border-brand-400 hover:shadow-md active:scale-98 disabled:opacity-60 disabled:pointer-events-none">
                             
                             {{-- Imagen o Placeholder --}}
@@ -181,7 +181,7 @@
                         </div>
 
                         <div class="flex items-center gap-1.5 shrink-0">
-                            @if ($selectedCustomer && !$selectedCustomer->isConsumidorFinal())
+                            @if ($selectedCustomer && !$selectedCustomer->isConsumidorFinal() && $canUpdateCustomer)
                                 <button
                                     type="button"
                                     wire:click="openEditCustomerModal"
@@ -199,12 +199,14 @@
                                 class="rounded-lg border border-primary-200 bg-white px-2.5 py-1 text-xs font-semibold text-primary-700 shadow-2xs hover:bg-primary-50">
                                 Cambiar
                             </button>
-                            <button
-                                type="button"
-                                x-on:click="$dispatch('open-modal', 'quick-customer-modal')"
-                                class="rounded-lg bg-brand-50 px-2 py-1 text-xs font-semibold text-brand-700 hover:bg-brand-100">
-                                + Nuevo
-                            </button>
+                            @if ($canCreateCustomer)
+                                <button
+                                    type="button"
+                                    x-on:click="$dispatch('open-modal', 'quick-customer-modal')"
+                                    class="rounded-lg bg-brand-50 px-2 py-1 text-xs font-semibold text-brand-700 hover:bg-brand-100">
+                                    + Nuevo
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -576,23 +578,27 @@
                             {{ $currencySymbol }}{{ number_format($held->total, 2) }}
                         </span>
 
-                        <x-button
-                            type="button"
-                            variant="secondary"
-                            size="sm"
-                            wire:click="resumeHeldSale({{ $held->id }})">
-                            {{ __t('resume_sale', 'sales') }}
-                        </x-button>
+                        @can('delete', $held)
+                            @if ($canCreateSale)
+                                <x-button
+                                    type="button"
+                                    variant="secondary"
+                                    size="sm"
+                                    wire:click="resumeHeldSale({{ $held->id }})">
+                                    {{ __t('resume_sale', 'sales') }}
+                                </x-button>
+                            @endif
 
-                        <button
-                            type="button"
-                            wire:click="deleteHeldSale({{ $held->id }})"
-                            class="text-rose-500 hover:text-rose-700 p-1"
-                            title="Descartar">
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                            </svg>
-                        </button>
+                            <button
+                                type="button"
+                                wire:click="deleteHeldSale({{ $held->id }})"
+                                class="text-rose-500 hover:text-rose-700 p-1"
+                                title="Descartar">
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                </svg>
+                            </button>
+                        @endcan
                     </div>
                 </div>
             @empty

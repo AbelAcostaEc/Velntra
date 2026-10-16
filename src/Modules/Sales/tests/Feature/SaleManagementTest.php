@@ -43,6 +43,8 @@ class SaleManagementTest extends TestCase
             'sales.update',
             'sales.delete',
             'sales.cancel',
+            'customers.create',
+            'customers.update',
         ];
 
         foreach ($permissions as $perm) {
@@ -436,6 +438,58 @@ class SaleManagementTest extends TestCase
             ->call('resumeHeldSale', $heldSale->id)
             ->assertSet('cart.'.$this->productA->id.'.quantity', 3)
             ->assertDispatched('toast');
+    }
+
+    public function test_view_only_user_cannot_resume_or_delete_pending_sales(): void
+    {
+        $this->actingAs($this->adminUser);
+        $sale = app(SaleService::class)->createSale([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->adminUser->id,
+            'status' => 'pending',
+        ], [
+            ['product_id' => $this->productA->id, 'quantity' => 1],
+        ]);
+        $this->actingAs($this->viewOnlyUser);
+
+        Livewire::test(PosIndex::class)
+            ->assertDontSeeHtml('wire:click="resumeHeldSale('.$sale->id.')"')
+            ->assertDontSeeHtml('wire:click="deleteHeldSale('.$sale->id.')"');
+
+        Livewire::test(PosIndex::class)
+            ->call('resumeHeldSale', $sale->id)
+            ->assertForbidden();
+        Livewire::test(PosIndex::class)
+            ->call('deleteHeldSale', $sale->id)
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('sales', ['id' => $sale->id, 'status' => 'pending']);
+        $this->assertDatabaseHas('sale_items', ['sale_id' => $sale->id]);
+    }
+
+    public function test_pos_customer_mutations_require_customer_permissions(): void
+    {
+        $operator = User::factory()->create();
+        $operator->givePermissionTo(['sales.view', 'sales.create']);
+        $customer = Customer::create(['name' => 'Protected Customer', 'is_active' => true]);
+        $this->actingAs($operator);
+
+        Livewire::test(PosIndex::class)
+            ->set('newCustomerName', 'Not Allowed')
+            ->call('createQuickCustomer')
+            ->assertForbidden();
+        Livewire::test(PosIndex::class)
+            ->set('selectedCustomerId', $customer->id)
+            ->call('openEditCustomerModal')
+            ->assertForbidden();
+        Livewire::test(PosIndex::class)
+            ->set('editingCustomerId', $customer->id)
+            ->set('editCustomerName', 'Not Allowed')
+            ->call('updateCustomer')
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('customers', ['name' => 'Not Allowed']);
+        $this->assertSame('Protected Customer', $customer->fresh()->name);
     }
 
     public function test_pos_index_processes_payment_and_creates_completed_sale(): void
