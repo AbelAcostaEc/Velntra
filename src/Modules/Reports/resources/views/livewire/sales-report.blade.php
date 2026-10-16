@@ -29,7 +29,19 @@
             @if ($sales->isEmpty())
                 <x-empty-state :title="__t('no_results', 'reports')" :description="__t('no_sales_period', 'reports')" />
             @else
-                <div class="-mx-5 overflow-x-auto"><table class="min-w-full divide-y divide-primary-200 text-sm"><thead class="bg-primary-50 text-left text-xs font-semibold uppercase text-primary-500"><tr><th class="px-5 py-3">{{ __t('sale', 'reports') }}</th><th class="px-5 py-3">{{ __t('date', 'reports') }}</th><th class="px-5 py-3">{{ __t('customer', 'reports') }}</th><th class="px-5 py-3">{{ __t('payment', 'reports') }}</th><th class="px-5 py-3 text-right">{{ __t('tax', 'reports') }}</th><th class="px-5 py-3 text-right">{{ __t('total', 'reports') }}</th></tr></thead><tbody class="divide-y divide-primary-100">@foreach ($sales as $sale)<tr><td class="px-5 py-3 font-semibold text-primary-900">{{ $sale->number }}</td><td class="whitespace-nowrap px-5 py-3 text-primary-600">{{ $sale->created_at->format('d/m/Y H:i') }}</td><td class="px-5 py-3 text-primary-700">{{ $sale->customer?->name ?? '—' }}</td><td class="px-5 py-3"><x-badge>{{ __t('payment_'.$sale->payment_method, 'reports') }}</x-badge></td><td class="px-5 py-3 text-right">{{ $currency['symbol'] }}{{ number_format((float) $sale->tax, 2) }}</td><td class="px-5 py-3 text-right font-semibold">{{ $currency['symbol'] }}{{ number_format((float) $sale->total, 2) }}</td></tr>@endforeach</tbody></table></div>
+                <div class="space-y-3 md:hidden">
+                    @foreach ($sales as $sale)
+                        <x-mobile-record-card data-report-mobile-card="sales" :title="$sale->number" :subtitle="$sale->created_at->format('d/m/Y H:i')">
+                            <x-slot:status><x-badge>{{ __t('payment_'.$sale->payment_method, 'reports') }}</x-badge></x-slot:status>
+                            <x-slot:meta>
+                                <div class="col-span-2 min-w-0"><dt class="text-xs text-primary-500">{{ __t('customer', 'reports') }}</dt><dd class="mt-1 break-words font-medium text-primary-900">{{ $sale->customer?->name ?? '—' }}</dd></div>
+                                <div><dt class="text-xs text-primary-500">{{ __t('tax', 'reports') }}</dt><dd class="mt-1 font-medium text-primary-900">{{ $currency['symbol'] }}{{ number_format((float) $sale->tax, 2) }}</dd></div>
+                                <div><dt class="text-xs text-primary-500">{{ __t('total', 'reports') }}</dt><dd class="mt-1 font-semibold text-primary-950">{{ $currency['symbol'] }}{{ number_format((float) $sale->total, 2) }}</dd></div>
+                            </x-slot:meta>
+                        </x-mobile-record-card>
+                    @endforeach
+                </div>
+                <div class="-mx-5 hidden overflow-x-auto md:block" data-report-desktop-table="sales"><table class="min-w-full divide-y divide-primary-200 text-sm"><thead class="bg-primary-50 text-left text-xs font-semibold uppercase text-primary-500"><tr><th class="px-5 py-3">{{ __t('sale', 'reports') }}</th><th class="px-5 py-3">{{ __t('date', 'reports') }}</th><th class="px-5 py-3">{{ __t('customer', 'reports') }}</th><th class="px-5 py-3">{{ __t('payment', 'reports') }}</th><th class="px-5 py-3 text-right">{{ __t('tax', 'reports') }}</th><th class="px-5 py-3 text-right">{{ __t('total', 'reports') }}</th></tr></thead><tbody class="divide-y divide-primary-100">@foreach ($sales as $sale)<tr><td class="px-5 py-3 font-semibold text-primary-900">{{ $sale->number }}</td><td class="whitespace-nowrap px-5 py-3 text-primary-600">{{ $sale->created_at->format('d/m/Y H:i') }}</td><td class="px-5 py-3 text-primary-700">{{ $sale->customer?->name ?? '—' }}</td><td class="px-5 py-3"><x-badge>{{ __t('payment_'.$sale->payment_method, 'reports') }}</x-badge></td><td class="px-5 py-3 text-right">{{ $currency['symbol'] }}{{ number_format((float) $sale->tax, 2) }}</td><td class="px-5 py-3 text-right font-semibold">{{ $currency['symbol'] }}{{ number_format((float) $sale->total, 2) }}</td></tr>@endforeach</tbody></table></div>
                 <div class="mt-4">{{ $sales->links() }}</div>
             @endif
         </x-card>

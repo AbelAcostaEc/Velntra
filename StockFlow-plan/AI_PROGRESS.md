@@ -25,9 +25,9 @@ POS, catálogo, historial, dashboard y reportes.
 | 04 - Clientes | 100 % | CRUD, Consumidor Final, búsqueda, historial, estadísticas y edición desde POS implementados y probados. |
 | 05 - Ventas | 100 % | POS, carrito, impuestos, descuento, métodos de pago, control de stock, ventas pendientes y anulaciones implementados y validados. |
 | 06 - Dashboard | 100 % | Métricas reales, últimas ventas, stock bajo, gráfico con períodos predefinidos y rango personalizado, accesos rápidos, permisos y diseño responsive implementados y probados. |
-| 07 - Reportes | 100 % | Reportes independientes de ventas, inventario y clientes con filtros, métricas, paginación, permisos y exportación Excel/PDF. Las pruebas leen el contenido Excel y verifican los PDF. |
+| 07 - Reportes | 100 % | Reportes independientes de ventas, inventario y clientes con filtros, métricas, paginación, permisos y exportación Excel/PDF. Las pruebas leen el contenido Excel y verifican los PDF. Las filas se presentan como tarjetas en móvil y tablas en escritorio. |
 | 08 - Configuración | 100 % | Empresa, moneda, IVA y logo implementados. El IVA se usa en ventas y el símbolo de moneda configurado aparece en las vistas monetarias del MVP. |
-| 09 - Calidad | 60 % | La suite y el build pasan. Hay prueba integral automatizada y permisos reforzados. El usuario confirmó Reportes responsive y los flujos de creación probados en navegador. Faltan revisar POS en móvil, abrir visualmente PDF/Excel y completar el recorrido manual de venta/anulación. |
+| 09 - Calidad | 60 % | La suite y el build pasan. Hay prueba integral automatizada y permisos reforzados. El usuario probó los flujos de creación en navegador y detectó que los registros de Reportes necesitaban tarjetas móviles; el ajuste ya tiene prueba automatizada, pero falta revalidación visual. También faltan revisar POS en móvil, abrir visualmente PDF/Excel y completar el recorrido manual de venta/anulación. |
 | 10 - Publicación | 5 % | Pendientes README, guía final, capturas, demo y despliegue. |
 
 ## Decisiones arquitectónicas aprobadas
@@ -73,6 +73,8 @@ POS, catálogo, historial, dashboard y reportes.
   clientes. Cada reporte exporta el conjunto filtrado completo en Excel y PDF;
   las métricas excluyen ventas pendientes y anuladas. Los botones de exportación
   se renderizan dentro de Livewire y las pruebas leen los datos exportados.
+  Los registros usan el patrón de tarjetas de Productos en pantallas pequeñas
+  y conservan las tablas a partir de `md`.
 - Configuración incluye información de empresa, logo, IVA y moneda. El símbolo
   de moneda seleccionado se refleja en POS, productos, historial de compras,
   dashboard y reportes. Cambiar la moneda no convierte importes existentes.
@@ -86,11 +88,13 @@ POS, catálogo, historial, dashboard y reportes.
 ## Verificación técnica ejecutada
 
 - Contenedores `app`, `mysql`, `nginx` y `node`: activos; MySQL saludable.
-- Suite unificada: 164 pruebas y 598 aserciones aprobadas (2026-10-15).
+- Suite unificada: 165 pruebas y 625 aserciones aprobadas (2026-10-16).
 - Build Vite de producción: aprobado.
-- Validación manual comunicada por el usuario (2026-10-16): Reportes funciona
-  en responsive y los flujos de creación que probó funcionan. No incluye aún
-  confirmación de apertura visual de PDF/Excel ni del POS en móvil.
+- Validación manual comunicada por el usuario (2026-10-16): los flujos de
+  creación que probó funcionan; señaló que los registros de Reportes debían
+  verse como tarjetas en móvil. El cambio está implementado y automatizado,
+  pendiente de revalidación visual. No incluye aún confirmación de apertura
+  visual de PDF/Excel ni del POS en móvil.
 - Las 17 migraciones aparecen aplicadas.
 - Laravel registró correctamente 78 rutas de aplicación.
 - El contenedor `app` ejecuta migraciones y seeders estructurales al arrancar;

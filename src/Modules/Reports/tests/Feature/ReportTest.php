@@ -123,6 +123,37 @@ class ReportTest extends TestCase
         $this->get(route('reports.customers'))->assertOk()->assertSeeLivewire(CustomerReport::class);
     }
 
+    public function test_each_report_displays_record_cards_on_mobile_and_a_table_on_desktop(): void
+    {
+        Product::create($this->productData('REPORT-MOBILE', 'Mobile product', 5, 2, 4));
+        $this->createSale('VTA-MOBILE-001', $this->customer, 'completed', 25, 3, now());
+        $this->actingAs($this->authorizedUser);
+
+        foreach ([
+            'reports.sales' => ['sales', 'VTA-MOBILE-001'],
+            'reports.inventory' => ['inventory', 'REPORT-MOBILE'],
+            'reports.customers' => ['customers', 'Report Customer'],
+        ] as $routeName => [$report, $expectedText]) {
+            $document = new DOMDocument;
+            @$document->loadHTML($this->get(route($routeName))->assertOk()->getContent());
+            $xpath = new DOMXPath($document);
+
+            $cards = $xpath->query('//article[@data-report-mobile-card="'.$report.'"]');
+            $mobileList = $xpath->query('//article[@data-report-mobile-card="'.$report.'"]/parent::div');
+            $desktopTables = $xpath->query('//div[@data-report-desktop-table="'.$report.'"]/table');
+            $desktopWrapper = $xpath->query('//div[@data-report-desktop-table="'.$report.'"]');
+
+            $this->assertCount(1, $cards, "{$routeName}: falta la tarjeta móvil.");
+            $this->assertStringContainsString($expectedText, $cards->item(0)->textContent);
+            $this->assertCount(1, $mobileList);
+            $this->assertContains('md:hidden', explode(' ', $mobileList->item(0)->getAttribute('class')));
+            $this->assertCount(1, $desktopTables, "{$routeName}: falta la tabla de escritorio.");
+            $this->assertCount(1, $desktopWrapper);
+            $this->assertContains('hidden', explode(' ', $desktopWrapper->item(0)->getAttribute('class')));
+            $this->assertContains('md:block', explode(' ', $desktopWrapper->item(0)->getAttribute('class')));
+        }
+    }
+
     public function test_export_buttons_render_inside_their_livewire_component(): void
     {
         $this->actingAs($this->authorizedUser);
