@@ -1,12 +1,14 @@
 <div>
     {{-- Barra superior de pestañas y ventas en espera --}}
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex items-center gap-2 rounded-2xl border border-primary-200 bg-white/80 p-1.5 shadow-xs backdrop-blur-sm">
+        <div class="grid w-full grid-cols-2 gap-1.5 rounded-2xl border border-primary-200 bg-primary-100 p-1.5 shadow-inner sm:w-auto" role="group" aria-label="{{ __t('pos', 'sales') }} / {{ __t('sales_history', 'sales') }}">
             <button
                 type="button"
                 wire:click="$set('activeTab', 'pos')"
-                class="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition {{ $activeTab === 'pos' ? 'bg-brand-600 text-white shadow-xs' : 'text-primary-600 hover:text-primary-900 hover:bg-primary-50' }}">
-                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                data-pos-tab="pos"
+                aria-pressed="{{ $activeTab === 'pos' ? 'true' : 'false' }}"
+                class="flex min-h-11 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-2.5 py-2.5 text-center text-xs font-semibold leading-tight transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 sm:gap-2 sm:px-4 sm:text-sm {{ $activeTab === 'pos' ? 'border-accent-600 bg-accent-600 text-white shadow-sm' : 'border-primary-200 bg-white text-primary-700 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-800' }}">
+                <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                 </svg>
                 {{ __t('pos', 'sales') }}
@@ -15,8 +17,10 @@
             <button
                 type="button"
                 wire:click="$set('activeTab', 'history')"
-                class="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition {{ $activeTab === 'history' ? 'bg-brand-600 text-white shadow-xs' : 'text-primary-600 hover:text-primary-900 hover:bg-primary-50' }}">
-                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                data-pos-tab="history"
+                aria-pressed="{{ $activeTab === 'history' ? 'true' : 'false' }}"
+                class="flex min-h-11 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-2.5 py-2.5 text-center text-xs font-semibold leading-tight transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 sm:gap-2 sm:px-4 sm:text-sm {{ $activeTab === 'history' ? 'border-accent-600 bg-accent-600 text-white shadow-sm' : 'border-primary-200 bg-white text-primary-700 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-800' }}">
+                <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
                 {{ __t('sales_history', 'sales') }}

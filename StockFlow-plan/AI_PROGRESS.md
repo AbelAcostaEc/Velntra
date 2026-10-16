@@ -27,7 +27,7 @@ POS, catálogo, historial, dashboard y reportes.
 | 06 - Dashboard | 100 % | Métricas reales, últimas ventas, stock bajo, gráfico con períodos predefinidos y rango personalizado, accesos rápidos, permisos y diseño responsive implementados y probados. |
 | 07 - Reportes | 100 % | Reportes independientes de ventas, inventario y clientes con filtros, métricas, paginación, permisos y exportación Excel/PDF. Las pruebas leen el contenido Excel y verifican los PDF. Las filas se presentan como tarjetas en móvil y tablas en escritorio. |
 | 08 - Configuración | 100 % | Empresa, moneda, IVA y logo implementados. El IVA se usa en ventas y el símbolo de moneda configurado aparece en las vistas monetarias del MVP. |
-| 09 - Calidad | 75 % | La suite y el build pasan. Hay prueba integral automatizada y permisos reforzados. El usuario confirmó las tarjetas de Reportes en responsive, la venta con descuento de stock y la anulación con restitución de stock en escritorio. El historial de ventas ya tiene tarjetas y acciones móviles cubiertas por prueba automatizada; falta revalidarlo visualmente, revisar el resto del POS en móvil y abrir visualmente PDF/Excel. |
+| 09 - Calidad | 80 % | La suite y el build pasan. Hay prueba integral automatizada y permisos reforzados. El usuario confirmó Reportes responsive, venta y anulación con stock correcto, además del historial y sus acciones en móvil. Se mejoró el selector Punto de Venta/Historial con colores reales del tema y prueba automatizada; falta revalidarlo visualmente, revisar el resto del POS en móvil y abrir visualmente PDF/Excel. |
 | 10 - Publicación | 5 % | Pendientes README, guía final, capturas, demo y despliegue. |
 
 ## Decisiones arquitectónicas aprobadas
@@ -89,15 +89,17 @@ POS, catálogo, historial, dashboard y reportes.
 ## Verificación técnica ejecutada
 
 - Contenedores `app`, `mysql`, `nginx` y `node`: activos; MySQL saludable.
-- Suite unificada: 166 pruebas y 635 aserciones aprobadas (2026-10-16).
+- Suite unificada: 167 pruebas y 653 aserciones aprobadas (2026-10-16).
 - Build Vite de producción: aprobado.
 - Validación manual comunicada por el usuario (2026-10-16): confirmó las
   tarjetas de Reportes en responsive, creó los datos necesarios y completó
   una venta desde cero; el stock se descontó correctamente. También anuló
   la venta en escritorio y comprobó que el stock se restauró. Detectó que el
-  historial y sus acciones no se veían en móvil; se añadieron tarjetas y una
-  prueba automatizada, pendiente de revalidación visual. Aún faltan confirmar
-  la apertura visual de PDF/Excel y el resto del POS en móvil.
+  historial y sus acciones no se veían en móvil; tras añadir tarjetas, confirmó
+  que ambos se muestran y funcionan. Señaló que el selector de pestañas quedaba
+  visualmente en blanco; se corrigió el color y diseño con prueba automatizada,
+  pendiente de revalidación visual. Aún faltan confirmar la apertura visual de
+  PDF/Excel y el resto del POS en móvil.
 - Las 17 migraciones aparecen aplicadas.
 - Laravel registró correctamente 78 rutas de aplicación.
 - El contenedor `app` ejecuta migraciones y seeders estructurales al arrancar;

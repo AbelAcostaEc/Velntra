@@ -585,6 +585,30 @@ class SaleManagementTest extends TestCase
         $this->assertCount(0, $viewerXPath->query('.//button[@*[name()="wire:click" and .="openCancelModal('.$completed->id.')"]]', $viewerCards->item(0)));
     }
 
+    public function test_pos_switcher_keeps_both_options_readable_in_each_tab(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        foreach (['pos' => 'history', 'history' => 'pos'] as $activeTab => $inactiveTab) {
+            $document = new DOMDocument;
+            @$document->loadHTML(Livewire::test(PosIndex::class)->set('activeTab', $activeTab)->html());
+            $xpath = new DOMXPath($document);
+
+            $activeButtons = $xpath->query('//button[@data-pos-tab="'.$activeTab.'"]');
+            $inactiveButtons = $xpath->query('//button[@data-pos-tab="'.$inactiveTab.'"]');
+
+            $this->assertCount(1, $activeButtons);
+            $this->assertCount(1, $inactiveButtons);
+            $this->assertSame('true', $activeButtons->item(0)->getAttribute('aria-pressed'));
+            $this->assertSame('false', $inactiveButtons->item(0)->getAttribute('aria-pressed'));
+            $this->assertContains('bg-accent-600', explode(' ', $activeButtons->item(0)->getAttribute('class')));
+            $this->assertContains('text-white', explode(' ', $activeButtons->item(0)->getAttribute('class')));
+            $this->assertContains('bg-white', explode(' ', $inactiveButtons->item(0)->getAttribute('class')));
+            $this->assertContains('text-primary-700', explode(' ', $inactiveButtons->item(0)->getAttribute('class')));
+            $this->assertContains('grid-cols-2', explode(' ', $activeButtons->item(0)->parentNode->getAttribute('class')));
+        }
+    }
+
     public function test_pos_index_can_edit_customer_directly_from_pos(): void
     {
         $this->actingAs($this->adminUser);
