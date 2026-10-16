@@ -13,7 +13,7 @@ reportes independientes, exportaciones verificadas y botones funcionales. El
 Sprint 08 cumple su Definition of Done: la moneda configurada se muestra en
 POS, catálogo, historial, dashboard y reportes.
 
-Última actualización: 2026-10-15.
+Última actualización: 2026-10-16.
 
 ## Avance por sprint
 
@@ -27,7 +27,7 @@ POS, catálogo, historial, dashboard y reportes.
 | 06 - Dashboard | 100 % | Métricas reales, últimas ventas, stock bajo, gráfico con períodos predefinidos y rango personalizado, accesos rápidos, permisos y diseño responsive implementados y probados. |
 | 07 - Reportes | 100 % | Reportes independientes de ventas, inventario y clientes con filtros, métricas, paginación, permisos y exportación Excel/PDF. Las pruebas leen el contenido Excel y verifican los PDF. |
 | 08 - Configuración | 100 % | Empresa, moneda, IVA y logo implementados. El IVA se usa en ventas y el símbolo de moneda configurado aparece en las vistas monetarias del MVP. |
-| 09 - Calidad | 55 % | La suite y el build pasan. Hay prueba integral automatizada desde login hasta anulación y reportes, y pruebas de permisos reforzadas. Faltan revisión responsive, comprobación visual de PDF/Excel y recorrido manual en navegador. |
+| 09 - Calidad | 60 % | La suite y el build pasan. Hay prueba integral automatizada y permisos reforzados. El usuario confirmó Reportes responsive y los flujos de creación probados en navegador. Faltan revisar POS en móvil, abrir visualmente PDF/Excel y completar el recorrido manual de venta/anulación. |
 | 10 - Publicación | 5 % | Pendientes README, guía final, capturas, demo y despliegue. |
 
 ## Decisiones arquitectónicas aprobadas
@@ -88,6 +88,9 @@ POS, catálogo, historial, dashboard y reportes.
 - Contenedores `app`, `mysql`, `nginx` y `node`: activos; MySQL saludable.
 - Suite unificada: 164 pruebas y 598 aserciones aprobadas (2026-10-15).
 - Build Vite de producción: aprobado.
+- Validación manual comunicada por el usuario (2026-10-16): Reportes funciona
+  en responsive y los flujos de creación que probó funcionan. No incluye aún
+  confirmación de apertura visual de PDF/Excel ni del POS en móvil.
 - Las 17 migraciones aparecen aplicadas.
 - Laravel registró correctamente 78 rutas de aplicación.
 - El contenedor `app` ejecuta migraciones y seeders estructurales al arrancar;
