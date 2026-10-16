@@ -13,7 +13,7 @@ reportes independientes, exportaciones verificadas y botones funcionales. El
 Sprint 08 cumple su Definition of Done: la moneda configurada se muestra en
 POS, catálogo, historial, dashboard y reportes.
 
-Última actualización: 2026-10-12.
+Última actualización: 2026-10-15.
 
 ## Avance por sprint
 
@@ -27,7 +27,7 @@ POS, catálogo, historial, dashboard y reportes.
 | 06 - Dashboard | 100 % | Métricas reales, últimas ventas, stock bajo, gráfico con períodos predefinidos y rango personalizado, accesos rápidos, permisos y diseño responsive implementados y probados. |
 | 07 - Reportes | 100 % | Reportes independientes de ventas, inventario y clientes con filtros, métricas, paginación, permisos y exportación Excel/PDF. Las pruebas leen el contenido Excel y verifican los PDF. |
 | 08 - Configuración | 100 % | Empresa, moneda, IVA y logo implementados. El IVA se usa en ventas y el símbolo de moneda configurado aparece en las vistas monetarias del MVP. |
-| 09 - Calidad | 40 % | La suite automatizada y el build pasan; faltan revisión responsive, comprobación visual de PDF/Excel y recorrido manual integral. |
+| 09 - Calidad | 55 % | La suite y el build pasan. Hay prueba integral automatizada desde login hasta anulación y reportes, y pruebas de permisos reforzadas. Faltan revisión responsive, comprobación visual de PDF/Excel y recorrido manual en navegador. |
 | 10 - Publicación | 5 % | Pendientes README, guía final, capturas, demo y despliegue. |
 
 ## Decisiones arquitectónicas aprobadas
@@ -78,11 +78,15 @@ POS, catálogo, historial, dashboard y reportes.
   dashboard y reportes. Cambiar la moneda no convierte importes existentes.
 - Hay pruebas feature para administración, inventario, clientes, ventas,
   dashboard y configuración, además de autenticación, perfil e idioma.
+- La prueba integral automatizada recorre login, alta de categoría, producto y
+  cliente, venta, anulación, restitución de stock y coherencia de métricas.
+- El POS exige permisos en acciones de ventas pendientes y de clientes; el
+  historial de compras limita los recibos al cliente consultado.
 
 ## Verificación técnica ejecutada
 
 - Contenedores `app`, `mysql`, `nginx` y `node`: activos; MySQL saludable.
-- Suite unificada: 160 pruebas y 560 aserciones aprobadas (2026-10-12).
+- Suite unificada: 164 pruebas y 598 aserciones aprobadas (2026-10-15).
 - Build Vite de producción: aprobado.
 - Las 17 migraciones aparecen aplicadas.
 - Laravel registró correctamente 78 rutas de aplicación.
@@ -93,7 +97,7 @@ POS, catálogo, historial, dashboard y reportes.
 `phpunit.xml` incluye la suite base y todos los tests de `Modules/*/tests`, por lo
 que `php artisan test` valida el proyecto completo con un solo comando.
 
-Queda recomendada una prueba manual del flujo:
+La prueba automatizada no sustituye el recorrido manual en navegador:
 
 ```text
 login -> cliente -> categoría -> producto -> venta -> anulación -> historial
