@@ -16,16 +16,14 @@ class UserManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_root_database_seeder_provisions_default_administrator(): void
+    public function test_root_database_seeder_does_not_create_a_second_administrator(): void
     {
         $this->seed(DatabaseSeeder::class);
 
-        $admin = User::where('email', 'admin@velntra.com')->first();
-
-        $this->assertNotNull($admin);
-        $this->assertNotNull($admin->email_verified_at);
-        $this->assertTrue($admin->hasRole('admin'));
-        $this->assertTrue($admin->can('users.create'));
+        $this->assertNull(User::where('email', 'admin@velntra.com')->first());
+        $this->assertSame(1, User::role('admin')->count());
+        $this->assertTrue($this->adminUser->fresh()->hasRole('admin'));
+        $this->assertTrue($this->adminUser->can('users.create'));
     }
 
     protected User $adminUser;

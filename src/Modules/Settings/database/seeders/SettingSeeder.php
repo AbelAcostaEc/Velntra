@@ -15,7 +15,7 @@ class SettingSeeder extends Seeder
     {
         $usd = Currency::where('code', 'USD')->first();
 
-        Setting::updateOrCreate(
+        Setting::firstOrCreate(
             ['id' => 1],
             [
                 'company_name'   => 'Velntra Store',
