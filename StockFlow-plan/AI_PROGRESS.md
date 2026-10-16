@@ -23,11 +23,11 @@ POS, catálogo, historial, dashboard y reportes.
 | 02 - Administración | 100 % | Usuarios, roles, permisos, perfil, servicios, policies y pruebas validadas. El registro público está deshabilitado; las cuentas se administran internamente. |
 | 03 - Inventario | 100 % | Categorías y productos con CRUD, búsqueda, filtros, imágenes, paginación y soft delete validados. Productos y categorías no requieren seeders porque son datos propios de cada negocio. |
 | 04 - Clientes | 100 % | CRUD, Consumidor Final, búsqueda, historial, estadísticas y edición desde POS implementados y probados. |
-| 05 - Ventas | 100 % | POS, carrito, impuestos, descuento, métodos de pago, control de stock, ventas pendientes y anulaciones implementados y validados. |
+| 05 - Ventas | 100 % | POS, carrito, impuestos, descuento, métodos de pago, control de stock, ventas pendientes y anulaciones implementados y validados. El usuario confirmó nuevamente una venta real desde cero y el descuento correcto de stock. |
 | 06 - Dashboard | 100 % | Métricas reales, últimas ventas, stock bajo, gráfico con períodos predefinidos y rango personalizado, accesos rápidos, permisos y diseño responsive implementados y probados. |
 | 07 - Reportes | 100 % | Reportes independientes de ventas, inventario y clientes con filtros, métricas, paginación, permisos y exportación Excel/PDF. Las pruebas leen el contenido Excel y verifican los PDF. Las filas se presentan como tarjetas en móvil y tablas en escritorio. |
 | 08 - Configuración | 100 % | Empresa, moneda, IVA y logo implementados. El IVA se usa en ventas y el símbolo de moneda configurado aparece en las vistas monetarias del MVP. |
-| 09 - Calidad | 60 % | La suite y el build pasan. Hay prueba integral automatizada y permisos reforzados. El usuario probó los flujos de creación en navegador y detectó que los registros de Reportes necesitaban tarjetas móviles; el ajuste ya tiene prueba automatizada, pero falta revalidación visual. También faltan revisar POS en móvil, abrir visualmente PDF/Excel y completar el recorrido manual de venta/anulación. |
+| 09 - Calidad | 70 % | La suite y el build pasan. Hay prueba integral automatizada y permisos reforzados. El usuario confirmó las tarjetas de Reportes en responsive, además de la creación de producto y una venta completa con descuento correcto de stock. Faltan revisar POS en móvil, abrir visualmente PDF/Excel y confirmar manualmente la anulación con restitución de stock en este recorrido. |
 | 10 - Publicación | 5 % | Pendientes README, guía final, capturas, demo y despliegue. |
 
 ## Decisiones arquitectónicas aprobadas
@@ -90,11 +90,11 @@ POS, catálogo, historial, dashboard y reportes.
 - Contenedores `app`, `mysql`, `nginx` y `node`: activos; MySQL saludable.
 - Suite unificada: 165 pruebas y 625 aserciones aprobadas (2026-10-16).
 - Build Vite de producción: aprobado.
-- Validación manual comunicada por el usuario (2026-10-16): los flujos de
-  creación que probó funcionan; señaló que los registros de Reportes debían
-  verse como tarjetas en móvil. El cambio está implementado y automatizado,
-  pendiente de revalidación visual. No incluye aún confirmación de apertura
-  visual de PDF/Excel ni del POS en móvil.
+- Validación manual comunicada por el usuario (2026-10-16): confirmó las
+  tarjetas de Reportes en responsive, creó los datos necesarios y completó
+  una venta desde cero; el stock se descontó correctamente. No incluye aún
+  confirmación de apertura visual de PDF/Excel, del POS en móvil ni de la
+  anulación con restitución de stock en este recorrido.
 - Las 17 migraciones aparecen aplicadas.
 - Laravel registró correctamente 78 rutas de aplicación.
 - El contenedor `app` ejecuta migraciones y seeders estructurales al arrancar;
